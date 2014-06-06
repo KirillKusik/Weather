@@ -18,7 +18,6 @@
     for (NSDictionary *dic in coreData.linsArray) {
         [mysql addRecordToDatabase:dic];
         [coreData deleteRecordFromDatabase:[dic objectForKey:@"id"]];
-        NSLog(@"test git");
     }
 }
 

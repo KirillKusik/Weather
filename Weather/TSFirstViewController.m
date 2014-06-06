@@ -8,16 +8,87 @@
 
 #import "TSFirstViewController.h"
 
+#import "TSDB.h"
+//#import "TSMySQLDB.h"
+#import "TSYahooWeather.h"
+//#import "TSSettings.h"
+//#import "TSCoreDataDB.h"
+
 @interface TSFirstViewController ()
+@property (nonatomic,weak) IBOutlet UITextField *city;
+@property (nonatomic,weak) IBOutlet UITextView *wather;
 
 @end
 
 @implementation TSFirstViewController
+@synthesize city,wather;
+
+
+
+
+-(IBAction)getWatherInCity:(id)sender{
+    if([self.city.text length] > 0 || [self.city.text isEqualToString:@""] == FALSE){
+        [self.view endEditing:YES];
+        
+        TSYahooWeather *weatherInCity = [TSYahooWeather new];
+        NSString *woeid = [[NSString alloc] initWithString:[weatherInCity getWoeid:city.text]];
+
+        if (woeid != nil){
+            NSMutableDictionary *weatherDictionary = [[NSMutableDictionary alloc] initWithDictionary:[weatherInCity getWeather:woeid]];
+            if(weatherDictionary != nil){
+                [weatherDictionary setObject:city.text forKey:@"city"];
+                NSString *textWeather = [NSString stringWithFormat:@"City = %@\nDate = %@\nTemp = %@C\nText = %@",[weatherDictionary objectForKey:@"city"],
+                    [weatherDictionary objectForKey:@"date"],
+                    [weatherDictionary objectForKey:@"temp"],
+                    [weatherDictionary objectForKey:@"text"]];
+                wather.text = textWeather;
+                
+                TSDB *db = [TSDB new];
+                if([db addRecordToDatabase:weatherDictionary])
+                    NSLog(@"data added to the table");
+                else
+                    [self showMasage:@"data is not added to the table"];
+            }
+            else
+            [self showMasage:@"server not responding weather"];
+        }
+        else
+        [self showMasage:@"WOEID on the city not found"];
+        
+    }
+    else
+        [self showMasage:@"Type a city in order to get"];
+}
+
+-(void) showMasage:(NSString *) errorString{
+    //NSLog(@"%@",parserDelegate.error);
+    UIAlertView *alert = [[UIAlertView alloc]
+                          initWithTitle:@"Input error"
+                          message:errorString
+                          delegate:self
+                          cancelButtonTitle:@"OK"
+                          otherButtonTitles:nil];
+    [alert show];
+}
+
+/*-(id) initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self){
+        
+    }
+}*/
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
+    UITapGestureRecognizer *tapToDismissKeyboard = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapped)];
+    [tapToDismissKeyboard setNumberOfTapsRequired:1];
+    [self.view addGestureRecognizer:tapToDismissKeyboard];
+}
+
+- (void)tapped{
+    [self.view endEditing:YES];
 }
 
 - (void)didReceiveMemoryWarning

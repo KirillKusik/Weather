@@ -34,7 +34,7 @@
 -(void) viewDidAppear:(BOOL)animated{
     //NSLog(@"ok");
     TSDB *db = [TSDB new];
-    weatherHistory = [NSArray arrayWithArray:[db getWeather]];
+    weatherHistory = [NSArray arrayWithArray:[db getArrayOfRecordsFromDatabase]];
     [table reloadData];
 }
 

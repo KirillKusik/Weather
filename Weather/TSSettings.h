@@ -8,26 +8,12 @@
 
 #import <Foundation/Foundation.h>
 
-@interface TSSettings : NSObject{
-    BOOL DBType;
-    NSUInteger DBCount;
-    NSString *addresDbHost;
-}
+@interface TSSettings : NSObject
+
 @property(nonatomic) BOOL DBType;
-@property(nonatomic) NSUInteger DBCount;
-@property(nonatomic) NSString *addresDbHost;
-
-
-/*-(void) setDBType:(BOOL)type;
--(BOOL) DBType;
-
--(void) setDBCount:(NSUInteger)count;
--(NSUInteger)DBCount;
-*/
-
+@property(nonatomic) NSUInteger limitRecordsInDatabase;
 
 +(instancetype) sharedController;
-
 -(void)saveSettings;
 
 @end

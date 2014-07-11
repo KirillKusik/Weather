@@ -12,8 +12,6 @@
 @interface TSSecondViewController : UIViewController{
     IBOutlet UILabel *dbCount;
     IBOutlet UISegmentedControl *DBChengControl;
-    IBOutlet UIButton *changHostName;
-    IBOutlet UITextField *hostAddres;
 }
 
 //@property (nonatomic,weak) UITextField *dbCount;

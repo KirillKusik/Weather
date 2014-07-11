@@ -23,7 +23,24 @@
 @implementation TSFirstViewController
 @synthesize city,wather;
 
-
+-(IBAction)testButon:(id)sender{
+    NSMutableDictionary *dic = [NSMutableDictionary new];
+    [dic setValue:@"doneck" forKey:@"city"];
+    [dic setValue:@"25" forKey:@"code"];
+    [dic setValue:@"07.06.2014" forKey:@"date"];
+    [dic setValue:@"20" forKey:@"temp"];
+    [dic setValue:@"test" forKey:@"text"];
+    
+    TSDB *db = [TSDB new];
+    
+    if ([db addRecordToDatabase:dic]) {
+        NSLog(@"data added to the table");
+    }
+    else{
+        NSLog(@"ERROR: %@",db.dbError);
+    }
+    
+}
 
 
 -(IBAction)getWatherInCity:(id)sender{
@@ -44,10 +61,9 @@
                 wather.text = textWeather;
                 
                 TSDB *db = [TSDB new];
-                if([db addRecordToDatabase:weatherDictionary])
-                    NSLog(@"data added to the table");
-                else
-                    [self showMasage:@"data is not added to the table"];
+                [db addRecordToDatabase:weatherDictionary];
+                NSLog(@"data added to the table");
+                
             }
             else
             [self showMasage:@"server not responding weather"];
@@ -78,8 +94,7 @@
     }
 }*/
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad{
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
     UITapGestureRecognizer *tapToDismissKeyboard = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapped)];

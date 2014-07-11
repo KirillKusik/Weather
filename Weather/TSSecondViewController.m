@@ -11,15 +11,12 @@
 #import "TSDB.h"
 @implementation TSSecondViewController
 
--(IBAction)changAddres:(id)sender{
-    [TSSettings sharedController].addresDbHost = hostAddres.text;
-    [[TSSettings sharedController] saveSettings];
-}
+
 
 -(IBAction)inc:(id)sender{
     NSInteger val = [dbCount.text integerValue];
     val++;
-    [TSSettings sharedController].DBCount = val;
+    [TSSettings sharedController].limitRecordsInDatabase = val;
     [[TSSettings sharedController] saveSettings];
     dbCount.text = [NSString stringWithFormat:@"%ld",(long)val];
 }
@@ -27,7 +24,7 @@
 -(IBAction)dec:(id)sender{
     NSInteger val = [dbCount.text integerValue];
     val--;
-    [TSSettings sharedController].DBCount = val;
+    [TSSettings sharedController].limitRecordsInDatabase = val;
     [[TSSettings sharedController] saveSettings];
     dbCount.text = [NSString stringWithFormat:@"%ld",(long)val];
     TSDB *db = [TSDB new];
@@ -38,15 +35,11 @@
     TSDB *db = [TSDB new];
     if(DBChengControl.selectedSegmentIndex == 0){
         [TSSettings sharedController].DBType = true;
-        [db mysqlToCoreData];
-        hostAddres.enabled = false;
-        changHostName.enabled = false;
+        [db sqlToCoreData];
     }
     else{
         [TSSettings sharedController].DBType = false;
-        [db coreDataToMysql];
-        hostAddres.enabled = true;
-        changHostName.enabled = true;
+        [db coreDataToSql];
     }
     [[TSSettings sharedController] saveSettings];
 }
@@ -55,21 +48,17 @@
 {
     [super viewDidLoad];
     
-    NSNumber *count = [NSNumber numberWithInteger:[[TSSettings sharedController] DBCount]];
+    NSNumber *count = [NSNumber numberWithInteger:[[TSSettings sharedController] limitRecordsInDatabase]];
     dbCount.text = [count stringValue];
     
-    hostAddres.text = [[TSSettings sharedController] addresDbHost];
+
     
     BOOL type = [[TSSettings sharedController]DBType];
     if (type){
         DBChengControl.selectedSegmentIndex = 0;
-        hostAddres.enabled = false;
-        changHostName.enabled = false;
     }
     else{
         DBChengControl.selectedSegmentIndex = 1;
-        hostAddres.enabled = true;
-        changHostName.enabled = true;
     }
 }
 

@@ -9,12 +9,11 @@
 #import "TSSettings.h"
 
 @implementation TSSettings
-@synthesize DBType,DBCount,addresDbHost;
+@synthesize DBType,limitRecordsInDatabase;
 
 static TSSettings *__sharedController = nil;
 
-+(instancetype)sharedController{
-    
++(instancetype)sharedController{    
     static dispatch_once_t oneToken;
     dispatch_once(&oneToken, ^{__sharedController = [[TSSettings alloc]init];
         [__sharedController resoreSettings];});
@@ -24,15 +23,13 @@ static TSSettings *__sharedController = nil;
 -(void)resoreSettings{
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     self.DBType = [[userDefaults objectForKey:@"DBType"] boolValue];
-    self.DBCount = [[userDefaults objectForKey:@"DBCount"] integerValue];
-    self.addresDbHost = [userDefaults objectForKey:@"addresDbHost"];
+    self.limitRecordsInDatabase = [[userDefaults objectForKey:@"DBCount"] integerValue];
 }
 
 -(void)saveSettings{
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults setObject:@(self.DBType) forKey:@"DBType"];
-    [userDefaults setObject:@(self.DBCount) forKey:@"DBCount"];
-    [userDefaults setObject:self.addresDbHost forKey:@"addresDbHost"];
+    [userDefaults setObject:@(self.limitRecordsInDatabase) forKey:@"DBCount"];
     [userDefaults synchronize];
 }
 

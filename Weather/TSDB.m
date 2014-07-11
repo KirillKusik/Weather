@@ -1,100 +1,128 @@
-//
-//  TSDB.m
-//  Weather
-//
-//  Created by Admin on 14.05.14.
-//  Copyright (c) 2014 123. All rights reserved.
-//
+/*
+ Класс работает с обееми (SQLait и CoreData) базами данных автоматически подключаясь к той, 
+ которая сейчас указана активной в настройках
+ 
+ поля баз данных
+ id (integer) - автоинкрементирующийся счетчик
+ city (string) - назнание города
+ code (string) - код обозначающий погодные условия в Yahoo Weather (0 tornado, 1 tropical storm, 2 hurricane и т.д)
+ date (string) - дата запроса погоды
+ temp (integer) - температура
+ text (string) - краткое примечание про облачность, осадки и т.д.
+*/
 
 #import "TSDB.h"
-#import "TSMySQLDB.h"
-#import "TSAppDelegate.h"
+
 @implementation TSDB
 
+@synthesize dbError;
 
--(void) coreDataToMysql{
-    TSAppDelegate *coreData = [TSAppDelegate new];
-    TSMySQLDB *mysql = [TSMySQLDB new];
-    for (NSDictionary *dic in coreData.linsArray) {
-        [mysql addRecordToDatabase:dic];
-        [coreData deleteRecordFromDatabase:[dic objectForKey:@"id"]];
+//********************************************
+//Метод копирует поля из coreData в SQLite после чего очишает исходную базу
+-(void) coreDataToSql{
+    TSCoreDataDB *coreDataDatabace = [TSCoreDataDB new];
+    TSSQLiteDB *sqlDatabase = [TSSQLiteDB new];
+    
+    //перезапись полей из coreData в SQLite
+    for (NSDictionary *dic in coreDataDatabace.linsArray){
+        [sqlDatabase addRecordToDatabase:dic];
+        
+// (!!!) когда исправлю метод кореДата заменить @"id" на символьную константу
+        [coreDataDatabace deleteRecordFromDatabase:[dic objectForKey:@"id"]];
     }
 }
 
--(void) mysqlToCoreData{
-    TSAppDelegate *coreData = [TSAppDelegate new];
-    TSMySQLDB *mysql = [TSMySQLDB new];
-    for (NSDictionary *dic in mysql.linsArray) {
-        [coreData addRecordToDatabase:dic];
-        [mysql deleteRecordFromDatabase:[[dic objectForKey:@"id"] integerValue]];
+
+//********************************************
+//Метод копирует поля из SQLite в coreData после чего очишает исходную базу
+-(void) sqlToCoreData{
+    TSCoreDataDB *coreDataDatabase = [TSCoreDataDB new];
+    TSSQLiteDB *sqlDatabase = [TSSQLiteDB new];
+    NSArray *sqlDatabase_RecordsArray = [NSArray arrayWithArray:[sqlDatabase getArrayOfRecordsFromDatabase]];
+    
+    //перезапись полей из SQLite в coreData
+    for (NSDictionary *dic in sqlDatabase_RecordsArray){
+        [coreDataDatabase addRecordToDatabase:dic];
+        [sqlDatabase deleteRecordFromDatabase:[[dic objectForKey:kSqlDatabaseKey_ID] integerValue]];
     }
 }
 
-
--(void) removeUnneededRecords{
+//********************************************
+//Метод удалит лишние поля (начиная от самых старых)
+//если в базе данных полей больше чем указанно в настройках
+-(BOOL) removeUnneededRecords{
     if ([[TSSettings sharedController] DBType]){
-        TSAppDelegate *coreData = [TSAppDelegate new];
+        TSCoreDataDB *coreData = [TSCoreDataDB new];
         [coreData removeUnneededRecords];
+        return YES;
     }
     else{
-        TSMySQLDB *mysql = [TSMySQLDB new];
-        [mysql removeUnneededRecords];    
+        TSSQLiteDB *sqlDatabase = [TSSQLiteDB new];
+        if (![sqlDatabase removeUnneededRecords]) {
+            dbError = [sqlDatabase sqLiteError];
+            return NO;
+        }
+        return YES;
     }
 }
 
+//********************************************
+//Метод добавляет новое поле с значениями из NSDictionary
 -(BOOL) addRecordToDatabase:(NSDictionary *)dictionary{
     if ([[TSSettings sharedController] DBType]){
-        TSAppDelegate *coreData = [TSAppDelegate new];
+        TSCoreDataDB *coreData = [TSCoreDataDB new];
         [coreData addRecordToDatabase:dictionary];
         return YES;
     }
     else{
-        TSMySQLDB *mysql = [TSMySQLDB new];
-        if([mysql addRecordToDatabase:dictionary])
-            return YES;
-        else
+        TSSQLiteDB *sqlDatabase = [TSSQLiteDB new];
+        if(![sqlDatabase addRecordToDatabase:dictionary]){
+            dbError = [sqlDatabase sqLiteError];
             return NO;
+        }
+        return YES;
     }
 }
 
--(BOOL)deleteRecordFromDatabase:(id)id{
+
+//********************************************
+//Метод удаляет поле с указанным id
+-(BOOL)deleteRecordFromDatabase:(id)recordID{
     if ([[TSSettings sharedController] DBType]){
-        TSAppDelegate *coreData = [TSAppDelegate new];
-        [coreData deleteRecordFromDatabase:id];
+        TSCoreDataDB *coreData = [TSCoreDataDB new];
+        [coreData deleteRecordFromDatabase:recordID];
         return YES;
     }
     else{
-        TSMySQLDB *mysql = [TSMySQLDB new];
-        if([mysql deleteRecordFromDatabase:[id integerValue]])
+        TSSQLiteDB *sqlDatabase = [TSSQLiteDB new];
+        if(![sqlDatabase deleteRecordFromDatabase:[recordID integerValue]]){
+            dbError = [sqlDatabase sqLiteError];
+            return NO;
+        }
         return YES;
-        else
-        return NO;
     }
 }
 
--(BOOL)refresh{
+//********************************************
+//Метод обновляет массив записей в базе
+-(void)refresh{
     if ([[TSSettings sharedController] DBType]){
-        TSAppDelegate *coreData = [TSAppDelegate new];
+        TSCoreDataDB *coreData = [TSCoreDataDB new];
         [coreData refresh];
-        return YES;
-    }
-    else{
-        TSMySQLDB *mysql = [TSMySQLDB new];
-        if([mysql refresh])
-        return YES;
-        else
-        return NO;
     }
 }
 
--(NSArray *)getWeather{
+//********************************************
+//Метод возвращает из базы данных массив записей (NSDictionary)
+-(NSArray *)getArrayOfRecordsFromDatabase{
     if ([[TSSettings sharedController] DBType]){
-        TSAppDelegate *coreData = [TSAppDelegate new];
+        TSCoreDataDB *coreData = [TSCoreDataDB new];
         return coreData.linsArray;
     }
     else{
-        TSMySQLDB *mysql = [TSMySQLDB new];
-        return mysql.linsArray;
+        TSSQLiteDB *sqlDatabase = [TSSQLiteDB new];
+        dbError = [sqlDatabase sqLiteError];
+        return [sqlDatabase getArrayOfRecordsFromDatabase];
     }
 }
 

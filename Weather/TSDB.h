@@ -1,25 +1,17 @@
-//
-//  TSDB.h
-//  Weather
-//
-//  Created by Admin on 14.05.14.
-//  Copyright (c) 2014 123. All rights reserved.
-//
-
 #import <Foundation/Foundation.h>
-//#import <CoreData/CoreData.h>
-#import "TSSettings.h"
+#import <CoreData/CoreData.h>
+#import "TSSQLiteDB.h"
+#import "TSCoreDataDB.h"
+
 
 @interface TSDB : NSObject
+    
+@property (nonatomic, readonly) NSError *dbError;
 
--(BOOL) addRecordToDatabase:(NSDictionary *) dictionary;
--(BOOL) deleteRecordFromDatabase:(id)id;
--(BOOL)refresh;
--(void) removeUnneededRecords;
-
--(NSArray *) getWeather;
-
--(void)mysqlToCoreData;
--(void)coreDataToMysql;
-
+-(void) sqlToCoreData;
+-(void) coreDataToSql;
+-(BOOL) deleteRecordFromDatabase:(id)recordID;
+-(BOOL) removeUnneededRecords;
+-(BOOL) addRecordToDatabase:(NSDictionary *)dictionary;
+-(NSArray *)getArrayOfRecordsFromDatabase;
 @end

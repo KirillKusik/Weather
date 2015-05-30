@@ -7,14 +7,16 @@
 //
 
 #import "TSHistoriController.h"
+#import "TSDatabase.h"
 
-@interface TSHistoriController ()
+
+@interface TSHistoriController (){
+    NSArray *datadaseArray;
+}
 
 @end
 
 @implementation TSHistoriController
-
-
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -25,16 +27,25 @@
     return self;
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad{
+    
     [super viewDidLoad];
     [self viewDidAppear:NO];
 }
 
--(void) viewDidAppear:(BOOL)animated{
-    //NSLog(@"ok");
-    TSDB *db = [TSDB new];
-    weatherHistory = [NSArray arrayWithArray:[db getArrayOfRecordsFromDatabase]];
+-(void)viewDidAppear:(BOOL)animated{
+
+    TSDatabase *database = [[TSDatabase alloc] init];
+    datadaseArray = [database getArrayOfRecordsFromDatabase];
+
+    if (datadaseArray == nil) {
+        [[[UIAlertView alloc] initWithTitle:database.error.domain
+                                    message:database.error.description
+                                    delegate:nil
+                            cancelButtonTitle:@"Ok"
+                            otherButtonTitles:nil] show];
+    }
+    
     [table reloadData];
 }
 
@@ -44,41 +55,34 @@
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     
-    return [weatherHistory count];
+    return [datadaseArray count];
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    
     static NSString *cellIdentifier = @"Cell Identifier";
     [tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:cellIdentifier];
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier forIndexPath:indexPath];
     
-    NSDictionary *historyLine = [weatherHistory objectAtIndex:[indexPath row]];
+    Weather *weather = [datadaseArray objectAtIndex:[indexPath row]];
+    NSString *historiLineString = [NSString stringWithFormat:@"%@ %@ %@",
+                       weather.date,
+                       weather.city,
+                       weather.temp];
     
-    NSString *fruit = [NSString stringWithFormat:@"%@ %@ %@",
-                       [historyLine objectForKey:@"date"],
-                       [historyLine objectForKey:@"city"],
-                       [historyLine objectForKey:@"temp"]];
-    [cell.textLabel setText:fruit];
-    if ( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone )
+    [cell.textLabel setText:historiLineString];
+    
+    if ( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone ){
+        
         cell.textLabel.font = [UIFont systemFontOfSize:14.0];
+    }
     return cell;
 }
 
-- (void)didReceiveMemoryWarning
-{
+- (void)didReceiveMemoryWarning{
+    
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end

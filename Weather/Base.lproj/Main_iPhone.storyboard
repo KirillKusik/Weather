@@ -16,50 +16,51 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="RbA-O8-lzu">
-                                <rect key="frame" x="20" y="44" width="280" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits"/>
-                            </textField>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="OCP-FR-acK">
-                                <rect key="frame" x="83" y="119" width="155" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
-                                <state key="normal" title="Weather">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="getWatherInCity:" destination="CZ4-MO-1fc" eventType="touchUpInside" id="QRs-SD-Y7V"/>
-                                </connections>
-                            </button>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8kf-1w-pYQ">
-                                <rect key="frame" x="20" y="206" width="280" height="193"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" red="0.92401919157608692" green="0.92401919157608692" blue="0.92401919157608692" alpha="1" colorSpace="calibratedRGB"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                            </textView>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="v0B-FC-NDK">
-                                <rect key="frame" x="20" y="433" width="88" height="30"/>
+                                <rect key="frame" x="110" y="153" width="88" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="TestButton">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <action selector="testButon:" destination="CZ4-MO-1fc" eventType="touchUpInside" id="NFp-zH-0jy"/>
+                                    <action selector="testButon:" destination="CZ4-MO-1fc" eventType="touchUpInside" id="dcq-Td-oiq"/>
                                 </connections>
                             </button>
+                            <searchBar contentMode="redraw" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="nHS-91-68s">
+                                <rect key="frame" x="0.0" y="18" width="320" height="44"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                <textInputTraits key="textInputTraits"/>
+                                <connections>
+                                    <outlet property="delegate" destination="CZ4-MO-1fc" id="ZWX-kE-zfQ"/>
+                                </connections>
+                            </searchBar>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="07v-bC-lpd">
+                                <rect key="frame" x="20" y="235" width="285" height="161"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="0.88595448369565222" green="0.88595448369565222" blue="0.88595448369565222" alpha="1" colorSpace="calibratedRGB"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
                     <tabBarItem key="tabBarItem" title="Weather" image="Wather1.png" id="u1e-5L-l1D"/>
                     <connections>
-                        <outlet property="city" destination="RbA-O8-lzu" id="TyD-mZ-Cf3"/>
-                        <outlet property="wather" destination="8kf-1w-pYQ" id="dGT-0V-ZHU"/>
+                        <outlet property="city" destination="nHS-91-68s" id="enR-mo-5s8"/>
+                        <outlet property="searchDisplayController" destination="uOj-mK-vsL" id="9YX-ln-d3y"/>
+                        <outlet property="weatherForecastField" destination="07v-bC-lpd" id="ol2-Y6-8lg"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Qh2-T1-AhA" sceneMemberID="firstResponder"/>
+                <searchDisplayController id="uOj-mK-vsL">
+                    <connections>
+                        <outlet property="delegate" destination="CZ4-MO-1fc" id="qsE-4Q-Yax"/>
+                        <outlet property="searchBar" destination="nHS-91-68s" id="MUu-8r-5qR"/>
+                        <outlet property="searchContentsController" destination="CZ4-MO-1fc" id="eBO-Gf-vv9"/>
+                        <outlet property="searchResultsDataSource" destination="CZ4-MO-1fc" id="HlC-We-ZzG"/>
+                        <outlet property="searchResultsDelegate" destination="CZ4-MO-1fc" id="m1L-Ic-Lge"/>
+                    </connections>
+                </searchDisplayController>
             </objects>
             <point key="canvasLocation" x="653" y="-138"/>
         </scene>
@@ -120,55 +121,54 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="1" translatesAutoresizingMaskIntoConstraints="NO" id="Qip-Iz-nzJ">
-                                <rect key="frame" x="99" y="43" width="123" height="29"/>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="nup-73-rDp">
+                                <rect key="frame" x="99" y="56" width="123" height="29"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <segments>
                                     <segment title="CoreData"/>
-                                    <segment title="MySQL"/>
+                                    <segment title="SQLite"/>
                                 </segments>
                                 <connections>
-                                    <action selector="dbCheng" destination="QUy-BD-bpt" eventType="valueChanged" id="3OV-1R-1ak"/>
+                                    <action selector="databaseCheng" destination="QUy-BD-bpt" eventType="valueChanged" id="HeS-lH-l27"/>
                                 </connections>
                             </segmentedControl>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="vTi-Y4-Pvw">
-                                <rect key="frame" x="112" y="272" width="46" height="30"/>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Sdi-sR-ddf">
+                                <rect key="frame" x="139" y="233" width="42" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" red="0.92401919160000001" green="0.92401919160000001" blue="0.92401919160000001" alpha="1" colorSpace="calibratedRGB"/>
-                                <state key="normal" title="+">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="inc:" destination="QUy-BD-bpt" eventType="touchUpInside" id="tKB-Gy-ycL"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HwC-8d-9an">
-                                <rect key="frame" x="166" y="272" width="46" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" red="0.94590692929999998" green="0.94590692929999998" blue="0.94590692929999998" alpha="1" colorSpace="calibratedRGB"/>
-                                <state key="normal" title="-">
-                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                </state>
-                                <connections>
-                                    <action selector="dec:" destination="QUy-BD-bpt" eventType="touchUpInside" id="f2f-fn-cch"/>
-                                </connections>
-                            </button>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2eq-rk-kJs">
-                                <rect key="frame" x="139" y="243" width="42" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ddH-go-EDZ">
+                                <rect key="frame" x="101" y="233" width="30" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="0.94569463315217395" green="0.94569463315217395" blue="0.94569463315217395" alpha="1" colorSpace="calibratedRGB"/>
+                                <state key="normal" title="+">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="incMaxCountValue:" destination="QUy-BD-bpt" eventType="touchUpInside" id="ZKb-qe-HuU"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="69V-57-HHd">
+                                <rect key="frame" x="189" y="233" width="29" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="0.91319208559782605" green="0.82025251588404557" blue="0.82947897811990723" alpha="1" colorSpace="calibratedRGB"/>
+                                <state key="normal" title="-">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="decMaxCountValue:" destination="QUy-BD-bpt" eventType="touchUpInside" id="s9f-YE-hfz"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <gestureRecognizers/>
                     </view>
                     <tabBarItem key="tabBarItem" title="Setings" image="Setings.png" id="Z7h-1E-pvt"/>
                     <connections>
-                        <outlet property="DBChengControl" destination="Qip-Iz-nzJ" id="Yhe-M0-bHp"/>
-                        <outlet property="dbCount" destination="2eq-rk-kJs" id="7rY-Yx-1WN"/>
+                        <outlet property="chengDatabaseControl" destination="nup-73-rDp" id="TXH-t8-j3A"/>
+                        <outlet property="databaseCount" destination="Sdi-sR-ddf" id="U6O-3M-ara"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3qq-4t-Ow8" sceneMemberID="firstResponder"/>

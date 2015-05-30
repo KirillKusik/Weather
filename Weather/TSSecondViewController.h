@@ -10,15 +10,9 @@
 
 
 @interface TSSecondViewController : UIViewController{
-    IBOutlet UILabel *dbCount;
-    IBOutlet UISegmentedControl *DBChengControl;
+    IBOutlet UILabel *databaseCount;
+    IBOutlet UISegmentedControl *chengDatabaseControl;
 }
-
-//@property (nonatomic,weak) UITextField *dbCount;
-
-
-
-
 
 
 @end

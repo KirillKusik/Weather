@@ -7,11 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "TSDB.h"
+
 
 @interface TSHistoriController : UIViewController <UITableViewDataSource, UITableViewDelegate>{
-    NSArray * weatherHistory;
+    
     IBOutlet UITableView *table;
 }
-//@property NSArray *fruits;
+
 @end

@@ -8,57 +8,75 @@
 
 #import "TSSecondViewController.h"
 #import "TSSettings.h"
-#import "TSDB.h"
+#import "TSDatabase.h"
+
 @implementation TSSecondViewController
 
 
-
--(IBAction)inc:(id)sender{
-    NSInteger val = [dbCount.text integerValue];
-    val++;
-    [TSSettings sharedController].limitRecordsInDatabase = val;
+//увиличивает допустимое количество записей в базе на одно поле
+-(IBAction)incMaxCountValue:(id)sender{
+    
+    NSInteger MaxCountValue = [databaseCount.text integerValue];
+    MaxCountValue++;
+    
+    [TSSettings sharedController].limitRecordsInDatabase = MaxCountValue;
     [[TSSettings sharedController] saveSettings];
-    dbCount.text = [NSString stringWithFormat:@"%ld",(long)val];
+    
+    databaseCount.text = [NSString stringWithFormat:@"%ld",(long)MaxCountValue];
 }
 
--(IBAction)dec:(id)sender{
-    NSInteger val = [dbCount.text integerValue];
-    val--;
-    [TSSettings sharedController].limitRecordsInDatabase = val;
-    [[TSSettings sharedController] saveSettings];
-    dbCount.text = [NSString stringWithFormat:@"%ld",(long)val];
-    TSDB *db = [TSDB new];
-    [db removeUnneededRecords];
-}
-
--(IBAction)dbCheng{
-    TSDB *db = [TSDB new];
-    if(DBChengControl.selectedSegmentIndex == 0){
-        [TSSettings sharedController].DBType = true;
-        [db sqlToCoreData];
+//уменьшает допустимое количество записей в базе на одно поле
+-(IBAction)decMaxCountValue:(id)sender{
+    
+    NSInteger MaxCountValue = [databaseCount.text integerValue];
+    MaxCountValue--;
+    
+    if (MaxCountValue > 0){
+        
+        [TSSettings sharedController].limitRecordsInDatabase = MaxCountValue;
+        [[TSSettings sharedController] saveSettings];
+        databaseCount.text = [NSString stringWithFormat:@"%ld",(long)MaxCountValue];
+    
+        TSDatabase *database = [TSDatabase new];
+        [database removeUnneededRecords];
     }
-    else{
-        [TSSettings sharedController].DBType = false;
-        [db coreDataToSql];
+
+}
+
+//изменить базу данных
+-(IBAction)databaseCheng{
+    
+    TSDatabase *database = [TSDatabase new];
+    if(chengDatabaseControl.selectedSegmentIndex == 0){
+        
+        [TSSettings sharedController].DBType = CoreDataDatabaseType;
+        [database sqlToCoreData];
+    }
+    else if(chengDatabaseControl.selectedSegmentIndex == 1){
+        
+        [TSSettings sharedController].DBType = SQLiteDatabaseType;
+        [database coreDataToSql];
     }
     [[TSSettings sharedController] saveSettings];
 }
+
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     
+    //загружаем настройки приложения
     NSNumber *count = [NSNumber numberWithInteger:[[TSSettings sharedController] limitRecordsInDatabase]];
-    dbCount.text = [count stringValue];
+    databaseCount.text = [count stringValue];
     
-
-    
-    BOOL type = [[TSSettings sharedController]DBType];
-    if (type){
-        DBChengControl.selectedSegmentIndex = 0;
+    DatabaseType databaseType = [[TSSettings sharedController]DBType];
+    if (databaseType == CoreDataDatabaseType){
+        
+        chengDatabaseControl.selectedSegmentIndex = 0;
     }
-    else{
-        DBChengControl.selectedSegmentIndex = 1;
+    else if(databaseType == SQLiteDatabaseType){
+        
+        chengDatabaseControl.selectedSegmentIndex = 1;
     }
 }
 
@@ -68,5 +86,18 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+#pragma mark - Alert view
+
+//метод выводит сообшение с указанной ошибкой
+-(void)showAlertViewWithError:(NSError *)error{
+    
+    [[[UIAlertView alloc] initWithTitle:error.domain
+                                message:error.description
+                               delegate:nil
+                      cancelButtonTitle:@"Ok"
+                      otherButtonTitles:nil] show];
+}
+
 
 @end

@@ -1,19 +1,25 @@
-//
-//  TSSettings.h
-//  Weather
-//
-//  Created by Admin on 19.05.14.
-//  Copyright (c) 2014 123. All rights reserved.
-//
+/*
+ Класс настроек
+ 
+ хранит и предоставляет тип активной базы данных и максимальное количество записей в ней
+ */
 
 #import <Foundation/Foundation.h>
 
+typedef enum {
+    CoreDataDatabaseType,
+    SQLiteDatabaseType
+} DatabaseType;
+
 @interface TSSettings : NSObject
 
-@property(nonatomic) BOOL DBType;
+@property(nonatomic) DatabaseType DBType;
 @property(nonatomic) NSUInteger limitRecordsInDatabase;
 
+//Инициализация синглтона
 +(instancetype) sharedController;
+
+//Сохранить настройки
 -(void)saveSettings;
 
 @end

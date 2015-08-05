@@ -1,64 +1,38 @@
-#import "TSCoreData.h"
+#import "TSWeatherCoreData.h"
 #import <CoreData/CoreData.h>
-#import "TSSettings.h"
 
 
-static NSString * const kDatabaseFailname = @"TSWeatherDatabase";
+static NSString * kDatabaseFailname = @"TSWeatherDatabase";
 
-@interface TSCoreData()
-
--(NSManagedObject *)searchWeatherRecordInDatabase:(Weather *)weather;
--(NSURL *)applicationDocumentsDirectory;
-@end
-
-
-@implementation TSCoreData
-
-@synthesize managedObjectContext = _managedObjectContext;
-@synthesize managedObjectModel = _managedObjectModel;
-@synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
-
+@implementation TSWeatherCoreData
 
 //Метод добавляет объект Weather в базу данных
 //Если количество записей в базе подошло к ограничительному значению
-//в конце будет удалина самая старая запись
--(BOOL)addRecordToDatabase:(Weather *)weather{
+//в конце будет удалена самая старая запись
+-(BOOL)addWeather:(TSWeather *)weather{
     
-    //Создаем обект для хранения в базе
+    //Создаем объект для хранения в базе
     NSManagedObject *weatherToInsert = [NSEntityDescription insertNewObjectForEntityForName:kDatabaseTableName
                                                                      inManagedObjectContext:self.managedObjectContext];
-    //наполняем его
     [weatherToInsert setValue:weather.city forKey:kDatabaseKey_City];
     [weatherToInsert setValue:weather.code forKey:kDatabaseKey_Code];
     [weatherToInsert setValue:weather.date forKey:kDatabaseKey_Date];
     [weatherToInsert setValue:weather.temp forKey:kDatabaseKey_Temp];
     [weatherToInsert setValue:weather.text forKey:kDatabaseKey_Text];
-    
-    //производим сохраниние изменений
     [self saveContext];
     
     //Проверяем появилась ли запись в базе
     if ([self searchWeatherRecordInDatabase:weather]) {
         
-        //Если запись попала в БД
-        //удаляем старые записи если привышено количество допустимых максимум
-        [self removeUnneededRecords];
         return YES;
-    }
-    //Если запись не появилась
-    else{
         
-        //генерируем ошибку
+    } else{//Если запись не появилась генерируем ошибку
+        
         NSString *coreDataError = @"Core Data Error";
         NSString *message = @"Write error";
         NSString *description = @"The record is not added to the database";
-        [self generateErrorWithDomain:coreDataError
-                         ErrorMessage:message
-                          Description:description];
-        
-        //сообщаем о ошибке
+        [self generateErrorWithDomain:coreDataError ErrorMessage:message Description:description];
         return NO;
-        
     }
 }
 
@@ -66,59 +40,50 @@ static NSString * const kDatabaseFailname = @"TSWeatherDatabase";
 //метод удаляет объект Weather из базы
 //если указанное значение не соответствует ни одной записи из базы
 //генерируется ошибка и метод возвращает ложное значение
--(BOOL)deleteRecordFromDatabase:(Weather *)weather{
+-(BOOL)deleteWeather:(TSWeather *)weather{
 
     //Находим запись в базе
     NSManagedObject *weatherToDelete = [self searchWeatherRecordInDatabase:weather];
 
-    //Если результат не пустой
+    //Если результат не пустой удаляем элемент
     if (weatherToDelete) {
-        
-        //Удаляем элемент
+
         [self.managedObjectContext deleteObject:weatherToDelete];
         [self saveContext];
-        
-        //сообщаем что удаление было успешным
         return YES;
-    }
-    //Если объект был пустым
-    else{
         
-        //генерируем ошибку
+    } else{//Если объект был пустым генерируем ошибку
+        
         NSString *coreDataError = @"Core Data Error";
         NSString *message = @"Unable to find the object to remove";
         NSString *description = @"A request for a given object returned an empty result";
         [self generateErrorWithDomain:coreDataError
                          ErrorMessage:message
                           Description:description];
-        
-        //сообщаем о ошибке
         return NO;
     }
 }
 
 
-//возврашает масив объектов Weather хранящихся в базе данных
--(NSArray *)getArrayOfRecordsFromDatabase{
+//возвращает массив объектов Weather хранящихся в базе данных
+-(NSArray *)getWeatherArray{
 
-    //Формируем запрос к базе
+    //делаем запрос
     NSEntityDescription *entity = [NSEntityDescription entityForName:kDatabaseTableName
                                               inManagedObjectContext:self.managedObjectContext];
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     [fetchRequest setEntity:entity];
-     
-    //делаем запрос
-    NSError *error = nil;
-    NSArray *resaltRequest = [_managedObjectContext executeFetchRequest:fetchRequest error:&error];
+    NSError *errorMessage;
+    NSArray *resaltRequest = [_managedObjectContext executeFetchRequest:fetchRequest error:&errorMessage];
+    _error = errorMessage;
     
-    //Если результат не нуливой
+    //Если результат не нулевой переписываем результат в массив объектов Weather
     if (resaltRequest != nil) {
         
-        //Переписываем результат в массив объектов Weather
         NSMutableArray *weatherArray = [[NSMutableArray alloc] init];
         for (NSManagedObject *extractedObject in resaltRequest) {
             
-            Weather *weather = [[Weather alloc] initWithNameOfCity:[extractedObject valueForKeyPath:kDatabaseKey_City]
+            TSWeather *weather = [[TSWeather alloc] initWithNameOfCity:[extractedObject valueForKeyPath:kDatabaseKey_City]
                                                               code:[extractedObject valueForKeyPath:kDatabaseKey_Code]
                                                               date:[extractedObject valueForKeyPath:kDatabaseKey_Date]
                                                               temp:[extractedObject valueForKeyPath:kDatabaseKey_Temp]
@@ -127,43 +92,38 @@ static NSString * const kDatabaseFailname = @"TSWeatherDatabase";
         }
         //возвращаем результат
         return weatherArray;
-    }
-    //Если запрос вернул пустой результат
-    else{
         
-        //генерируем ошибку
+    } else{//Если запрос вернул пустой результат генерируем ошибку
+        
         NSString *coreDataError = @"Core Data Error";
         NSString *message = @"Read error";
         NSString *description = @"The query result was empty";
         [self generateErrorWithDomain:coreDataError
                          ErrorMessage:message
                           Description:description];
-        
-        //возврашаеи nil
         return nil;
     }
 }
 
 
 //Если количество записей подошло к ограничительному значению метод удалить самую старую запись
-//при полнастью заполненой базе после выполнения метода в ней останется столько записей сколько указанно в настройках
--(void)removeUnneededRecords{
+//при полностью заполненной базе после выполнения метода в ней останется столько записей сколько указанно в настройках
+-(void)setCountRecords:(NSUInteger)count{
     
     //получаем массив объектов из базы
-    NSArray *weatherArray = [self getArrayOfRecordsFromDatabase];
+    NSArray *weatherArray = [self getWeatherArray];
     
-    //Если записей больше чем нужно
-    for (NSInteger index = [[TSSettings sharedController] limitRecordsInDatabase]; index < [weatherArray count]; index++) {
+    //Если записей больше чем нужно удаляем лишние начиная с самой старой
+    for (NSInteger index = count; index < [weatherArray count]; index++) {
         
-        Weather *weatherToDelete = [weatherArray firstObject];
-        [self deleteRecordFromDatabase:weatherToDelete];
+        TSWeather *weatherToDelete = [weatherArray firstObject];
+        [self deleteWeather:weatherToDelete];
     }
-    
 }
 
 
 //метод ищет указанную (экземпляр класса Weather) запись в базе данных 
--(NSManagedObject *)searchWeatherRecordInDatabase:(Weather *)weather{
+-(NSManagedObject *)searchWeatherRecordInDatabase:(TSWeather *)weather{
     
     //Указываем настройки базы
     NSManagedObjectContext *context = self.managedObjectContext;
@@ -182,35 +142,29 @@ static NSString * const kDatabaseFailname = @"TSWeatherDatabase";
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
     [request setEntity:entityDesctiption];
     [request setPredicate:predicate];
-    
-    //Полуучаем результаты запроса
     NSArray *objectsFromDatabase = [context executeFetchRequest:request error:nil];
     
-    //Если результат не пустой
+    //Если результат не пустой возвращаем первый элемент из массива
     if ([objectsFromDatabase count] > 0) {
         
-        //Возврашаем первый элемент из массива
         return [objectsFromDatabase firstObject];
         
-    }
-    //Если не найдено ни одной записи вернуть nil
-    else{
+    } else{//Если не найдено ни одной записи вернуть nil
         
         return nil;
     }
 }
 
 
-
-
 #pragma mark - Core Data metods
 
 - (void)saveContext{
-    NSError *error = nil;
+    NSError *errorMessage = nil;
     _managedObjectContext = self.managedObjectContext;
     if (_managedObjectContext != nil) {
-        if ([_managedObjectContext hasChanges] && ![_managedObjectContext save:&error]) {
-            NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+        if ([_managedObjectContext hasChanges] && ![_managedObjectContext save:&errorMessage]) {
+            NSLog(@"Unresolved error %@, %@", errorMessage, [errorMessage userInfo]);
+            _error = errorMessage;
             abort();
         }
     }
@@ -264,6 +218,18 @@ static NSString * const kDatabaseFailname = @"TSWeatherDatabase";
 - (NSURL *)applicationDocumentsDirectory{
     return [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory
                                                    inDomains:NSUserDomainMask] lastObject];
+}
+
+#pragma mark - Generate Error metod
+//метод генерацыи ошибки
+-(void)generateErrorWithDomain:(NSString *)domain
+                  ErrorMessage:(NSString *)message
+                   Description:(NSString *)description{
+    
+    NSArray *objArray = [NSArray arrayWithObjects:description, message, nil];
+    NSArray *keyArray = [NSArray arrayWithObjects:NSLocalizedDescriptionKey, NSLocalizedFailureReasonErrorKey, nil];
+    NSDictionary *userInfo = [NSDictionary dictionaryWithObjects:objArray forKeys:keyArray];
+    _error = [NSError errorWithDomain:domain code:1 userInfo:userInfo];
 }
 
 @end

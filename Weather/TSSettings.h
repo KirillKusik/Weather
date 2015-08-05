@@ -13,11 +13,11 @@ typedef enum {
 
 @interface TSSettings : NSObject
 
-@property(nonatomic) DatabaseType DBType;
-@property(nonatomic) NSUInteger limitRecordsInDatabase;
+@property(nonatomic) DatabaseType databaseType;
+@property(nonatomic) NSUInteger databaseCount;
 
 //Инициализация синглтона
-+(instancetype) sharedController;
++(instancetype)sharedSettings;
 
 //Сохранить настройки
 -(void)saveSettings;

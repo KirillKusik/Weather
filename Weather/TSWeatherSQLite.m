@@ -1,37 +1,28 @@
 /*
  Класс обеспечивает доступ к базе данных SQLite.
- 
- Класс специализирует базу ограничивая лишние функции которые не применяются в данном приложении. 
- Также берет на себя формирование SQL запросов.
- 
- Для подключения к базе испльзуется оболочка fmdb.
-*/
+ Для подключения к базе используется оболочка fmdb.
+ */
 
-#import "TSSQLite.h"
+#import "TSWeatherSQLite.h"
 #import "TSSettings.h"
 #import "FMDB.h"
 
-static NSString * const kDatabaseFailname = @"Weather.sqlite";
+static NSString * kDatabaseFailname = @"Weather.sqlite";
 
-@interface TSSQLite(){
+@interface TSWeatherSQLite(){
     FMDatabase * sqLiteDatabase;
 }
-
--(BOOL)databaseConnected;
 @end
 
-@implementation TSSQLite
-@synthesize error;
-
+@implementation TSWeatherSQLite
 
 //метод добавляет экземпляр класса Weather в базу данных SQLite
-//и следит что-бы база не содержала лишних записей
--(BOOL)addRecordToDatabase:(Weather *)weather{
+//и следит что бы база не содержала лишних записей
+-(BOOL)addWeather:(TSWeather *)weather{
     
-    //подключаюсь к базе данных
+    //подключаюсь к базе данных, если подключение произашло без ошибок добавляем в базу новую запись
     if ([self databaseConnected]){
-    
-        //если подключение произашло без ошибок добавляем в базу новую запись
+
         NSString *insertRequest = [NSString stringWithFormat:
                                @"insert into %@ ('%@','%@','%@', %@,'%@') values ('%@','%@','%@','%@','%@')",
                                kDatabaseTableName,
@@ -46,46 +37,31 @@ static NSString * const kDatabaseFailname = @"Weather.sqlite";
                                weather.temp,
                                weather.text];
     
-        //проверка выполняется ли запрос
+        //Добавляем запись
         if ([sqLiteDatabase validateSQL:insertRequest error:nil]) {
-            
-            //Добавляем запись
+
             [sqLiteDatabase executeUpdate:insertRequest];
             [sqLiteDatabase close];
-            
-            //если есть удаляем лишние записи
-            [self removeUnneededRecords];
-            
             return YES;
-        }
-        //Если данные не добавленны
-        else{
             
+        } else{//Если данные не добавленны генерируем ошибку
+        
             [sqLiteDatabase close];
-            
-            //генерируем ошибку
             NSString *sqliteError = @"SQLite Error";
             NSString *message = @"Write error";
             NSString *description = @"Custom error writing data to the database";
-            
-            [self generateErrorWithDomain:sqliteError
-                             ErrorMessage:message
-                              Description:description];
-            
-            //сообщаем о ошибке
+            [self generateErrorWithDomain:sqliteError ErrorMessage:message Description:description];
             return NO;
         }
-    }
-    //Подключения к базе не произашло
-    else{
+    } else{//Подключения к базе не произашло
+
         return NO;
     }
 }
 
 
-
 //метод удаляет указанный объект из базы
--(BOOL)deleteRecordFromDatabase:(Weather *)weather{
+-(BOOL)deleteWeather:(TSWeather *)weather{
     
     //Устанавливаем подключение к базе данных
     if ([self databaseConnected]) {
@@ -104,47 +80,36 @@ static NSString * const kDatabaseFailname = @"Weather.sqlite";
         [resalts next];
         NSString *idToDelete = [resalts stringForColumn:kDatabaseKey_ID];
         
-        //Составляем запрос на удаление записи
+        //Выполняем удаление
         NSString *deleteRequest = [NSString stringWithFormat:@"DELETE FROM %@ WHERE %@ = '%@'",
                                    kDatabaseTableName,
                                    kDatabaseKey_ID,
                                    idToDelete];
 
-        //проверка выполняется ли запрос
         if ([sqLiteDatabase validateSQL:deleteRequest error:nil]) {
-            
-            //Выполняем удаление
+
             [sqLiteDatabase executeUpdate:deleteRequest];
             [sqLiteDatabase close];
             return YES;
-        }
-        //Если запрос не корректен
-        else{
-            
+        } else{//Если запрос не корректен генерируем ошибку
+        
             [sqLiteDatabase close];
-            
-            //генерируем ошибку
             NSString *sqliteError = @"SQLite Error";
             NSString *message = @"Deleting error";
             NSString *description = @"The request for removal of records was rejected by base";
-            
-            [self generateErrorWithDomain:sqliteError
-                             ErrorMessage:message
-                              Description:description];
+            [self generateErrorWithDomain:sqliteError ErrorMessage:message Description:description];
             return NO;
         }
         
-    }
-    //Если подключение к базе не произошло
-    else{
+    } else{//Если подключение к базе не произошло
+        
         return NO;
     }
 }
 
 
-
-//метод возврашает масив всех записей (NSDictionary) хранящихся в базе SQLite
--(NSArray *)getArrayOfRecordsFromDatabase{
+//метод возврашает масив всех записей хранящихся в базе SQLite
+-(NSArray *)getWeatherArray{
     
     //подключаюсь к базе данных
     if ([self databaseConnected]) {
@@ -152,69 +117,63 @@ static NSString * const kDatabaseFailname = @"Weather.sqlite";
         NSString * selectRequest = [NSString stringWithFormat:@"select * from %@",kDatabaseTableName];
         FMResultSet *resalts = [sqLiteDatabase executeQuery:selectRequest];
         
-        //переписать результат запроса в масив
+        //переписать результат запроса в массив
         NSMutableArray *weatherArray = [NSMutableArray new];
         while ([resalts next]) {
 
             NSNumber *weatherTemp = [NSNumber numberWithInt:[[resalts stringForColumn:kDatabaseKey_Temp] intValue]];
-            Weather *weatherRecord = [[Weather alloc] initWithNameOfCity:[resalts stringForColumn:kDatabaseKey_City]
+            TSWeather *weatherRecord = [[TSWeather alloc] initWithNameOfCity:[resalts stringForColumn:kDatabaseKey_City]
                                                                     code:[resalts stringForColumn:kDatabaseKey_Code]
                                                                     date:[resalts stringForColumn:kDatabaseKey_Date]
                                                                     temp:weatherTemp
                                                                     text:[resalts stringForColumn:kDatabaseKey_Text]];
-            
             [weatherArray addObject:weatherRecord];
         }
         
         [sqLiteDatabase close];
         return weatherArray;
-    }
-    //Если подключения не произашло
-    else{
+        
+    } else{//Если подключения не произашло
+
         return nil;
     }
 }
 
 
-
-//метод удаляет старые записи если их боьше чем указанно в настройках
--(void)removeUnneededRecords{
+//метод удаляет старые записи если их больше чем указанно в настройках
+-(void)setCountRecords:(NSUInteger)count{
     
     //получаем массив объектов из базы
-    NSArray *weatherArray = [self getArrayOfRecordsFromDatabase];
+    NSArray *weatherArray = [self getWeatherArray];
     
-    //Пока записей не снанет не больше чем указанно в настройках
-    for (NSInteger index = [[TSSettings sharedController] limitRecordsInDatabase]; index < [weatherArray count]; index++) {
+    //Пока записей больше чем указанно в настройках
+    for (NSInteger index = count; index < [weatherArray count]; index++) {
         
         //удалить первую запись в массиве
-        Weather *weatherToDelete = [weatherArray firstObject];
-        [self deleteRecordFromDatabase:weatherToDelete];
+        TSWeather *weatherToDelete = [weatherArray firstObject];
+        [self deleteWeather:weatherToDelete];
     }
 }
-
 
 
 //Устанавливает соединение с базой данных. Если соединение успешно вернет YES.
 //В противном случае вернет NO и сформирует ошибку.
 -(BOOL)databaseConnected{
     
-    //Подготавливаем подключение к базе
+    //подключаемся к базе
     NSArray *documentPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentDir = [documentPaths objectAtIndex:0];
     NSString *databasePath = [documentDir stringByAppendingPathComponent:kDatabaseFailname];
     NSFileManager *fileManager = [NSFileManager defaultManager];
     
-    //если база сушествовала
+    //если база сушествовала открываем ее
     if([fileManager fileExistsAtPath:databasePath]){
         
-        //открываем ее
         sqLiteDatabase = [FMDatabase databaseWithPath:databasePath];
         [sqLiteDatabase open];
-    }
-    //если базы не сушествует
-    else{
         
-        //создать ее
+    } else{//если базы не сушествует создать ее
+
         sqLiteDatabase = [FMDatabase databaseWithPath:databasePath];
         [sqLiteDatabase open];
         NSString * createTableRequest = [NSString stringWithFormat:
@@ -227,22 +186,17 @@ static NSString * const kDatabaseFailname = @"Weather.sqlite";
                                          kDatabaseKey_Temp,
                                          kDatabaseKey_Text];
         
-        //проверяем создастся ли таблица
+        //создаем таблицу
         if ([sqLiteDatabase executeUpdate:createTableRequest]){
             
-            //создаем таблицу
             [sqLiteDatabase executeUpdate:createTableRequest];
-        }
-        //Если запрос на создание таблицы не выполняется
-        else{
             
-            //генерируем ошибку
+        } else{//Если запрос на создание таблицы не выполняется генерируем ошибку
+
             NSString *sqliteError = @"SQLite Error";
             NSString *errorMessage = [NSString stringWithFormat:@"table: %@ not create", kDatabaseTableName];
             NSString *errorDescription = @"database create error";
-            [self generateErrorWithDomain:sqliteError
-                             ErrorMessage:errorMessage
-                              Description:errorDescription];
+            [self generateErrorWithDomain:sqliteError ErrorMessage:errorMessage Description:errorDescription];
             [sqLiteDatabase close];
             return NO;
         }
@@ -253,22 +207,25 @@ static NSString * const kDatabaseFailname = @"Weather.sqlite";
         
         //Все хорошо
         return YES;
-    }
-    //Если запрос к таблице произашол с ошибкой
-    else{
+    } else{//Если запрос к таблице не произашол генерируем ошибку
         
-        //генерируем ошибку
         NSString *sqliteError = @"SQLite Error";
         NSString *errorMessage = @"error test query";
         NSString *errorDescription = @"database is not responding";
-        
-        [self generateErrorWithDomain:sqliteError
-                         ErrorMessage:errorMessage
-                          Description:errorDescription];
-        
+        [self generateErrorWithDomain:sqliteError ErrorMessage:errorMessage Description:errorDescription];
         [sqLiteDatabase close];
         return NO;
     }
 }
 
+//метод генерацыи ошибки
+-(void)generateErrorWithDomain:(NSString *)domain
+                  ErrorMessage:(NSString *)message
+                   Description:(NSString *)description{
+    
+    NSArray *objArray = [NSArray arrayWithObjects:description, message, nil];
+    NSArray *keyArray = [NSArray arrayWithObjects:NSLocalizedDescriptionKey, NSLocalizedFailureReasonErrorKey, nil];
+    NSDictionary *userInfo = [NSDictionary dictionaryWithObjects:objArray forKeys:keyArray];
+    _error = [NSError errorWithDomain:domain code:1 userInfo:userInfo];
+}
 @end

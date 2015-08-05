@@ -6,175 +6,150 @@
 */
 
 #import "TSYahooWeather.h"
+#import "TSYahooGeocode.h"
 
-static NSString * const kWoeidKey_query = @"query";
-static NSString * const kWoeidKey_results = @"results";
-static NSString * const kWoeidKey_place = @"place";
-static NSString * const kWoeidKey_adminRegion = @"admin1";
-static NSString * const kWoeidKey_content = @"content";
-static NSString * const kWoeidKey_district = @"locality1";
-static NSString * const kWoeidKey_count = @"count";
-static NSString * const kWoeidKey_item = @"item";
-static NSString * const kWoeidKey_condition = @"condition";
-static NSString * const kWoeidKey_location = @"location";
-static NSString * const kWoeidKey_channel = @"channel";
+NSString * kYahooWeatherKey_query = @"query";
+NSString * kYahooWeatherKey_results = @"results";
+NSString * kYahooWeatherKey_place = @"place";
+NSString * kYahooWeatherKey_adminRegion = @"admin1";
+NSString * kYahooWeatherKey_content = @"content";
+NSString * kYahooWeatherKey_district = @"locality1";
+NSString * kYahooWeatherKey_count = @"count";
+NSString * kYahooWeatherKey_item = @"item";
+NSString * kYahooWeatherKey_condition = @"condition";
+NSString * kYahooWeatherKey_location = @"location";
+NSString * kYahooWeatherKey_channel = @"channel";
 
-static NSString * const kWoeidKey_city = @"city";
-static NSString * const kWoeidKey_code = @"code";
-static NSString * const kWoeidKey_date = @"date";
-static NSString * const kWoeidKey_temp = @"temp";
-static NSString * const kWoeidKey_text = @"text";
+NSString * kYahooWeatherKey_city = @"city";
+NSString * kYahooWeatherKey_code = @"code";
+NSString * kYahooWeatherKey_date = @"date";
+NSString * kYahooWeatherKey_temp = @"temp";
+NSString * kYahooWeatherKey_text = @"text";
 
-@interface TSYahooWeather()
--(NSDictionary *)getAddressOfDictionary:(NSDictionary *)place;
--(NSArray *)woeids:(NSString *)city;
-@end
+NSString * kYahooWeatherKey_country = @"country";
+NSString * kYahooWeatherKey_region = @"region";
+NSString * kYahooWeatherKey_town = @"town";
+NSString * kYahooWeatherKey_Geocode = @"woeid";
 
 @implementation TSYahooWeather
 
-@synthesize error;
-
-//Возвращает массив с прогнозом погоды в населенны пунктах
-//с названиями соответствующими введенному слову
-//также проверяет и подготавливает вводимое значение
--(NSArray *)getWoeidArray:(NSString *)city{
+//Возвращает массив геокодов населенны пунктов названия которых соответствуют введенному слову
+-(NSArray *)getYahooGeocodes:(NSString *)city{
     
-    //Если введеная строка не пустая
+    //Если введеная строка не пустая запрашиваем массив городов с похожими названиями
     if([city length] > 0 || [city isEqualToString:@""] == FALSE){
     
-        //Подготавливаем слово для поиска
         NSString *cityName = [city lowercaseString];
         cityName = [cityName stringByReplacingOccurrencesOfString:@" " withString:@""];
-
-        //Возврашаем результат запроса
-        return  [self woeids:cityName];
-    }
-    //Если сторока пуста
-    else{
+        return  [self geocodes:cityName];
         
-        //Генерируем ошибку
+    } else{//Если сторока пуста генерируем ошибку
+        
         NSString *searchError = @"RESP Error";
         NSString *messageError = @"string is empty";
         NSString *descriptionError =@"Serarch string is empty";
-        
         [self generateErrorWithDomain:searchError
                          ErrorMessage:messageError
                           Description:descriptionError];
-        
-        NSLog(@"Serarch string is empty");
         return nil;
     }
 }
 
-//Возвращает массив с прогнозом погоды в населенны пунктах
-//с названиями соответствующими введенному слову
--(NSArray *)woeids:(NSString *)city{
+//Возвращает массив геокодов населенны пунктов
+-(NSArray *)geocodes:(NSString *)city{
     
-    //загружаем данные по названию города в формате json
-    NSString *woeidUrlString = [NSString stringWithFormat:@"http://query.yahooapis.com/v1/public/yql?q=select * from geo.places where text=\"%@\"&format=json", city];
-    NSString *utfWoeidUrlString = [woeidUrlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    NSURL *URLWoeid = [NSURL URLWithString:utfWoeidUrlString];
-    NSData *responseJsonData = [NSData dataWithContentsOfURL:URLWoeid];
+    //загружаем данные по городам с похожими названиями в формате json
+    NSString *geocodeUrlString = [NSString stringWithFormat:@"http://query.yahooapis.com/v1/public/yql?q=select * from geo.places where text=\"%@\"&format=json", city];
+    NSString *utfGeocodeUrlString = [geocodeUrlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    NSURL *geocodeURL = [NSURL URLWithString:utfGeocodeUrlString];
+    NSData *responseJsonData = [NSData dataWithContentsOfURL:geocodeURL];
     
     //конвертируем данные в словарь
     NSError *errorMassage;
     NSDictionary *responseDic = [NSJSONSerialization JSONObjectWithData:responseJsonData
                                                                 options:NSJSONReadingMutableContainers
                                                                   error:&errorMassage];
-    //если преобразование выполнилось корректно
-    if ([NSJSONSerialization isValidJSONObject:responseDic])
-    {
+    
+    //если преобразование выполнилось корректно извлекаем из списка адреса и геокоды городов
+    if ([NSJSONSerialization isValidJSONObject:responseDic]){
         
-        //извлекаем из списка данные для массива адресов
-        NSDictionary *query = [responseDic objectForKey:kWoeidKey_query];
-        NSDictionary *results = [query objectForKey:kWoeidKey_results];
+        NSDictionary *query = [responseDic objectForKey:kYahooWeatherKey_query];
+        NSDictionary *results = [query objectForKey:kYahooWeatherKey_results];
         
-        //если был найден хоть один населенный пункт
+        //если был найден хоть один населенный пункт получим его адрес
         if (![results isEqual:[NSNull null]]){
             
-            //получим адреса найденных населенных пунктов
             NSMutableArray *resaltArray = [[NSMutableArray alloc] init];
-            
-            NSInteger numberFoundLocations = [[query objectForKey:kWoeidKey_count] integerValue];
+            NSInteger numberFoundLocations = [[query objectForKey:kYahooWeatherKey_count] integerValue];
             if (numberFoundLocations == 1) {
                 
-                NSDictionary *place = [results objectForKey:kWoeidKey_place];
-                [resaltArray addObject:[self getAddressOfDictionary:place]];
-            }
-            else{
+                NSDictionary *place = [results objectForKey:kYahooWeatherKey_place];
+                [resaltArray addObject:[self getGeocodeFromDictionary:place]];
+            
+            } else{
                 
-                NSArray *places = [results objectForKey:kWoeidKey_place];
+                NSArray *places = [results objectForKey:kYahooWeatherKey_place];
                 for (NSDictionary *place in places) {
                 
-                    NSDictionary *address = [self getAddressOfDictionary:place];
+                    TSYahooGeocode *address = [self getGeocodeFromDictionary:place];
                     if (address) {
                         [resaltArray addObject:address];
                     }
                 }
             }
-            //возвращаем массив словарей с адресами найденных населенных пунктов
+            //возвращаем массив объектов TSYahooGeocode с адресами найденных населенных пунктов
             return resaltArray;
-        }
-        //если не найдено не одного населенного пункта
-        else{
             
-            //Генерируем ошибку
+        } else{//если не найдено не одного населенного пункта генерируем ошибку
+            
             NSString *searchError = @"RESP Error";
             NSString *messageError = @"Nothing Found";
             NSString *descriptionError =@"Search on this request returned no results";
-            
-            [self generateErrorWithDomain:searchError
-                             ErrorMessage:messageError
-                              Description:descriptionError];
+            [self generateErrorWithDomain:searchError ErrorMessage:messageError Description:descriptionError];
             return nil;
         }
-    }
-    //ели полученны не корректные данные
-    else{
+    } else{//если получены не корректные данные завершаем метод с ошибкой
         
-        //завершаем метод с ошибкой
-        error = errorMassage;
+        _error = errorMassage;
         return nil;
     }
 }
 
-//выделяет из словаря только страну, область, город и гео-код
--(NSDictionary *)getAddressOfDictionary:(NSDictionary *)place{
+//выделяет из словаря только страну, область, город и геокод
+-(TSYahooGeocode *)getGeocodeFromDictionary:(NSDictionary *)place{
     
-    NSDictionary *contryDic = [place objectForKey:kWoeidKey_country];
+    NSDictionary *contryDic = [place objectForKey:kYahooWeatherKey_country];
     NSString *contry;
-    if (![contryDic isEqual:[NSNull null]]){ contry = [contryDic objectForKey:kWoeidKey_content];}
+    if (![contryDic isEqual:[NSNull null]]){ contry = [contryDic objectForKey:kYahooWeatherKey_content];}
     else{ contry = @"";}//если нет названия страны
     
-    NSDictionary *regionDic = [place objectForKey:kWoeidKey_adminRegion];
+    NSDictionary *regionDic = [place objectForKey:kYahooWeatherKey_adminRegion];
     NSString *region;
-    if (![regionDic isEqual:[NSNull null]]){ region = [regionDic objectForKey:kWoeidKey_content];}
-    else{ region = @"";}//если нет названия облость
+    if (![regionDic isEqual:[NSNull null]]){ region = [regionDic objectForKey:kYahooWeatherKey_content];}
+    else{ region = @"";}//если нет названия область
     
-    NSDictionary *townDic = [place objectForKey:kWoeidKey_district];
+    NSDictionary *townDic = [place objectForKey:kYahooWeatherKey_district];
     NSString *town;
-    if (![townDic isEqual:[NSNull null]]){ town = [townDic objectForKey:kWoeidKey_content];}
+    if (![townDic isEqual:[NSNull null]]){ town = [townDic objectForKey:kYahooWeatherKey_content];}
     else{ return nil; }//если нет названия города завершить итерацию
+
+    NSString *geocodeID;
+    if (![townDic isEqual:[NSNull null]]){ geocodeID = [townDic objectForKey:kYahooWeatherKey_Geocode];}
+    else{ return nil; }//если нет геокода завершить итерацию
     
-    NSDictionary *woeidDic = [place objectForKey:kWoeidKey_district];
-    NSString *woeid;
-    if (![woeidDic isEqual:[NSNull null]]){ woeid = [woeidDic objectForKey:kWoeidKey_woeid];}
-    else{ return nil; }//если нет гео-кода завершить итерацию
-    
-    NSDictionary *resalpPlace = [[NSDictionary alloc] initWithObjectsAndKeys:
-                                 contry, kWoeidKey_country,
-                                 region, kWoeidKey_region,
-                                 town, kWoeidKey_town,
-                                 woeid, kWoeidKey_woeid, nil];
-    return resalpPlace;
+    TSYahooGeocode *geocode = [[TSYahooGeocode alloc] initGeocodeWithContry:contry
+                                                                     region:region
+                                                                       town:town
+                                                                    geocode:geocodeID];
+    return geocode;
 }
 
 
-//метод возвращает прогноз погоды (объект Weather) по введенному гео-коду
--(Weather *)getWeather:(NSString *)woeid{
+//метод возвращает прогноз погоды (объект Weather) по введенному геокоду
+-(TSWeather *)getYahooWeather:(NSString *)geocode{
 
     //Загружаем прогноз погоды по введенному геокоду
-    NSString *weatherRequest = [NSString stringWithFormat:@"http://query.yahooapis.com/v1/public/yql?q=select * from weather.forecast where woeid=\"%@\" and u='c' &format=json", woeid];
+    NSString *weatherRequest = [NSString stringWithFormat:@"http://query.yahooapis.com/v1/public/yql?q=select * from weather.forecast where woeid=\"%@\" and u='c' &format=json", geocode];
     NSString *utfWeatherRequest = [weatherRequest stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSURL *URLWeather = [NSURL URLWithString:utfWeatherRequest];
     
@@ -185,65 +160,67 @@ static NSString * const kWoeidKey_text = @"text";
     NSDictionary *responseDic = [NSJSONSerialization JSONObjectWithData:responseJsonData
                                                                 options:NSJSONReadingMutableContainers
                                                                   error:&errorMassage];
-    //если данные коректно конвертировались в словарь
+    //если данные корректно конвертировались в словарь
     if ([NSJSONSerialization isValidJSONObject:responseDic])
     {
         //извлекаем из словаря данные для заполнения объекта Weather
-        NSDictionary *query = [responseDic objectForKey:kWoeidKey_query];
-        NSDictionary *results = [query objectForKey:kWoeidKey_results];
+        NSDictionary *query = [responseDic objectForKey:kYahooWeatherKey_query];
+        NSDictionary *results = [query objectForKey:kYahooWeatherKey_results];
     
-        //если в ответе присутствуют данные о погоде
+        //если в ответе присутствуют данные о погоде извлекаем данные из списка ответа
         if (![results isEqual:[NSNull null]]){
-            
-            //извлекаем данные из списка ответа
+
             NSDictionary *channel = [results objectForKey:@"channel"];
+            NSString *city = [[channel objectForKey:kYahooWeatherKey_location] objectForKey:kYahooWeatherKey_city];
             
-            NSString *city = [[channel objectForKey:kWoeidKey_location] objectForKey:kWoeidKey_city];
-            if ([city isEqual:[NSNull null]]){
-                
-                //если объект с именем city не найден генерируем ошибку и завершаем метод
+            //если объект с именем city не найден генерируем ошибку и завершаем метод
+            if (city == nil){
+
                 [self generateErrorWithDomain:@"Yahoo weather error"
                                  ErrorMessage:@"Objeckt city not found"
                                   Description:@"Is not listed in the loaded parameter with the key city"];
                 return nil;
             }
             
-            NSDictionary *condition = [[channel objectForKey:kWoeidKey_item] objectForKey:kWoeidKey_condition];
+            NSDictionary *condition = [[channel objectForKey:kYahooWeatherKey_item] objectForKey:kYahooWeatherKey_condition];
+            NSString *code = [condition objectForKey:kYahooWeatherKey_code];
             
-            NSString *code = [condition objectForKey:kWoeidKey_code];
-            if ([code isEqual:[NSNull null]]){
+            //если объект с именем code не найден генерируем ошибку и завершаем метод
+            if (code == nil){
                 
-                //если объект с именем code не найден генерируем ошибку и завершаем метод
                 [self generateErrorWithDomain:@"Yahoo weather error"
                                  ErrorMessage:@"Objeckt code not found"
                                   Description:@"Is not listed in the loaded parameter with the key code"];
                 return nil;
             }
             
-            NSString *date = [condition objectForKey:kWoeidKey_date];
-            if ([date isEqual:[NSNull null]]){
-                
-                //если объект с именем date не найден генерируем ошибку и завершаем метод
+            NSString *date = [condition objectForKey:kYahooWeatherKey_date];
+            
+            //если объект с именем date не найден генерируем ошибку и завершаем метод
+            if (date == nil){
+
                 [self generateErrorWithDomain:@"Yahoo weather error"
                                  ErrorMessage:@"Objeckt date not found"
                                   Description:@"Is not listed in the loaded parameter with the key date"];
                 return nil;
             }
             
-            NSNumber *temp = [NSNumber numberWithInt:[[condition objectForKey:kWoeidKey_temp] intValue]];
-            if ([temp isEqual:[NSNull null]]){
+            NSNumber *temp = [NSNumber numberWithInt:[[condition objectForKey:kYahooWeatherKey_temp] intValue]];
+            
+            //если объект с именем temp не найден генерируем ошибку и завершаем метод
+            if (temp == nil){
                 
-                //если объект с именем temp не найден генерируем ошибку и завершаем метод
                 [self generateErrorWithDomain:@"Yahoo weather error"
                                  ErrorMessage:@"Objeckt temp not found"
                                   Description:@"Is not listed in the loaded parameter with the key temp"];
                 return nil;
             }
             
-            NSString *text = [condition objectForKey:kWoeidKey_text];
+            NSString *text = [condition objectForKey:kYahooWeatherKey_text];
+            
+            //если объект с именем text не найден генерируем ошибку и завершаем метод
             if ([text isEqual:[NSNull null]]){
-                
-                //если объект с именем text не найден генерируем ошибку и завершаем метод
+
                 [self generateErrorWithDomain:@"Yahoo weather error"
                                  ErrorMessage:@"Objeckt text not found"
                                   Description:@"Is not listed in the loaded parameter with the key text"];
@@ -251,28 +228,23 @@ static NSString * const kWoeidKey_text = @"text";
             }
             
             //возвращаем объект Weather с полученными данными
-            Weather *weather = [[Weather alloc] initWithNameOfCity:city
+            TSWeather *weather = [[TSWeather alloc] initWithNameOfCity:city
                                                               code:code
                                                               date:date
                                                               temp:temp
                                                               text:text];
             return weather;
-        }
-        //Если данные о погоде не найдены в ответе
-        else{
             
-            //генерируем оштбку и завершаем метод
+        } else{//Если данные о погоде не найдены в ответе генерируем оштбку и завершаем метод
+            
             [self generateErrorWithDomain:@"Yahoo weather error"
                              ErrorMessage:@"Objeckt resalts not found"
                               Description:@"Is not listed in the loaded parameter with the key resalts"];
             return nil;
         }
-    }
-    //соловарь конвертировался не корректно
-    else{
+    } else{//если соловарь конвертировался не корректно завершаем метод с ошибкой
         
-        //завершаем метод с ошибкой
-        error = errorMassage;
+        _error = errorMassage;
         return nil;
     }
 }
@@ -285,6 +257,6 @@ static NSString * const kWoeidKey_text = @"text";
     NSArray *objArray = [NSArray arrayWithObjects:description, message, nil];
     NSArray *keyArray = [NSArray arrayWithObjects:NSLocalizedDescriptionKey, NSLocalizedFailureReasonErrorKey, nil];
     NSDictionary *userInfo = [NSDictionary dictionaryWithObjects:objArray forKeys:keyArray];
-    error = [NSError errorWithDomain:domain code:1 userInfo:userInfo];
+    _error = [NSError errorWithDomain:domain code:1 userInfo:userInfo];
 }
 @end

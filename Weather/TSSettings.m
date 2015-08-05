@@ -6,38 +6,35 @@
 
 #import "TSSettings.h"
 
-static NSString * const kSettings_databaseType = @"DBType";
-static NSString * const kSettings_databaseCount = @"DBCount";
+static NSString * kSettings_databaseType = @"DBType";
+static NSString * kSettings_databaseCount = @"DBCount";
 
 @implementation TSSettings
 
-@synthesize DBType,limitRecordsInDatabase;
+static TSSettings *__sharedSettings = nil;
 
-static TSSettings *__sharedController = nil;
-
-//Инициализация синглтона
-+(instancetype)sharedController{
++(instancetype)sharedSettings{
     
     static dispatch_once_t oneToken;
-    dispatch_once(&oneToken, ^{__sharedController = [[TSSettings alloc]init];
-        [__sharedController restoreSettings];});
-    return __sharedController;
+    dispatch_once(&oneToken, ^{__sharedSettings = [[TSSettings alloc]init];
+        [__sharedSettings restoreSettings];});
+    return __sharedSettings;
 }
 
 //Загрузить настройки
 -(void)restoreSettings{
     
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    self.DBType = [[userDefaults objectForKey:kSettings_databaseType] boolValue];
-    self.limitRecordsInDatabase = [[userDefaults objectForKey:kSettings_databaseCount] integerValue];
+    _databaseType = [[userDefaults objectForKey:kSettings_databaseType] boolValue];
+    _databaseCount = [[userDefaults objectForKey:kSettings_databaseCount] integerValue];
 }
 
 //Сохранить настройки
 -(void)saveSettings{
     
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    [userDefaults setObject:@(self.DBType) forKey:kSettings_databaseType];
-    [userDefaults setObject:@(self.limitRecordsInDatabase) forKey:kSettings_databaseCount];
+    [userDefaults setObject:@(self.databaseType) forKey:kSettings_databaseType];
+    [userDefaults setObject:@(self.databaseCount) forKey:kSettings_databaseCount];
     [userDefaults synchronize];
 }
 

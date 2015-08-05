@@ -11,7 +11,7 @@
 @implementation TSAppDelegate
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    [TSSettings sharedController];
+    [TSSettings sharedSettings];
     return YES;
 }
 							

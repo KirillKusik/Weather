@@ -7,9 +7,9 @@
  text - дополнительный комментарий по погодным условиям
  */
 
-#import "Weather.h"
+#import "TSWeather.h"
 
-@implementation Weather
+@implementation TSWeather
 
 //Инициализация объекта Weather с параметрами
 -(id)initWithNameOfCity:(NSString *)city
@@ -29,12 +29,9 @@
     return  self;
 }
 
--(void)print{
-    
-    NSLog(@"city - %@",[self city]);
-    NSLog(@"code - %@",[self code]);
-    NSLog(@"data - %@",[self date]);
-    NSLog(@"temp - %@",[self temp]);
-    NSLog(@"text - %@",[self text]);
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"city-%@ code-%@ data-%@ temp-%@ text-%@", _city, _code, _date, _temp, _text];
 }
+
 @end

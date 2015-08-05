@@ -6,22 +6,14 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "TSDatabase.h"
-
-
-static NSString * const kWoeidKey_country = @"country";
-static NSString * const kWoeidKey_region = @"region";
-static NSString * const kWoeidKey_town = @"town";
-static NSString * const kWoeidKey_woeid = @"woeid";
+#import "TSWeather.h"
 
 @interface TSYahooWeather : NSObject
-@property (nonatomic, readonly) NSError *error;
+@property (readonly) NSError *error;
 
-//Возвращает массив с прогнозом погоды в населенны пунктах
-//с названиями соответствующими введенному слову
-//также проверяет и подготавливает вводимое значение
--(NSArray *)getWoeidArray:(NSString *)city;
+//Возвращает массив геокодов населенны пунктов названия которых соответствуют введенному слову
+-(NSArray *)getYahooGeocodes:(NSString *)city;
 
-//метод возвращает прогноз погоды (объект Weather) по введенному гео-коду
--(Weather *)getWeather:(NSString *)woeid;
+//метод возвращает прогноз погоды (объект Weather) по введенному геокоду
+-(TSWeather *)getYahooWeather:(NSString *)geocode;
 @end

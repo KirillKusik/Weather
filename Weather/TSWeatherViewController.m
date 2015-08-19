@@ -217,7 +217,7 @@
 
 #pragma mark - HUD methods
 
-//показать брогресбар
+//показать хаб
 -(void)showHUD{
     
     HUD = [[MBProgressHUD alloc] initWithView:self.view];
@@ -226,7 +226,7 @@
     [HUD show:YES];
 }
 
-//скрыть прогресбар
+//скрыть хаб
 -(void)hideHUD{
     
     [HUD removeFromSuperview];

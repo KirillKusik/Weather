@@ -7,6 +7,8 @@
 #import "TSWeatherDatabasePreform.h"
 #import "TSSettings.h"
 
+@class TSWeather;
+
 @interface TSWeatherDatabase : NSObject{
     DatabaseType databaseType;
     NSUInteger databaseCount;
@@ -29,11 +31,11 @@
 -(BOOL)deleteWeather:(TSWeather *)weather;
 
 //Возвращает массив объектов типа Weather из активной на данный момент базы
--(NSArray *)getWeatherArray;
+-(NSArray *)getAllWeathers;
 
 //Метод удалит лишние поля (начиная от самых старых)
 //если в базе данных полей больше чем указанно в настройках
--(void)removeUnneededRecords;
+-(void)removeSurplusRecords;
 
 //Метод копирует поля из coreData в SQLite после чего очищает исходную базу
 -(void)sqlToCoreData;

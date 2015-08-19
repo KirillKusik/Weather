@@ -5,7 +5,7 @@
 #import <UIKit/UIKit.h>
 
 
-@interface TSHistoriViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>{
+@interface TSHistoryViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>{
     
     IBOutlet UITableView *table;
 }

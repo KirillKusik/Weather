@@ -1,6 +1,6 @@
 #import "TSWeatherCoreData.h"
 #import <CoreData/CoreData.h>
-
+#import "TSWeather.h"
 
 static NSString * kDatabaseFailname = @"TSWeatherDatabase";
 

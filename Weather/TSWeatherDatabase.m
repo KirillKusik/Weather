@@ -3,9 +3,11 @@
  которая сейчас указана активной в настройках
 */
 
+#import "TSWeather.h"
 #import "TSWeatherDatabase.h"
 #import "TSWeatherSQLite.h"
 #import "TSWeatherCoreData.h"
+
 
 @implementation TSWeatherDatabase
 
@@ -105,7 +107,7 @@
 
 
 //Возвращает массив объектов типа Weather из активной на данный момент базы
--(NSArray *)getWeatherArray{
+-(NSArray *)getAllWeathers{
 
     //Если в настройках указан тип базы CoreData
     if (databaseType == CoreDataDatabaseType){
@@ -137,19 +139,19 @@
         } else{//Если массив пуст
             
             _error = sqLite.error;
-            return NO;
+            return nil;
         }
     } else{//Если указан другой тип базы сгенерировать ошибку
         
         [self generateDatabaseTypeError];
-        return NO;
+        return nil;
     }
 }
 
 
 //Метод удалит лишние поля (начиная от самых старых)
 //если в базе данных полей больше чем указанно в настройках
--(void)removeUnneededRecords{
+-(void)removeSurplusRecords{
     
     //Если в настройках указан тип базы CoreData
     if (databaseType == CoreDataDatabaseType){

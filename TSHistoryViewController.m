@@ -2,16 +2,17 @@
  ViewController демонстрирующий историю просмотренных прогнозов
  */
 
-#import "TSHistoriViewController.h"
+#import "TSHistoryViewController.h"
 #import "TSWeatherDatabase.h"
+#import "TSWeather.h"
 
-@interface TSHistoriViewController (){
+@interface TSHistoryViewController (){
     NSArray *datadaseArray;
 }
 
 @end
 
-@implementation TSHistoriViewController
+@implementation TSHistoryViewController
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -37,7 +38,7 @@
 -(void)viewDidAppear:(BOOL)animated{
 
     TSWeatherDatabase *database = [[TSWeatherDatabase alloc] initWithSettings:[TSSettings sharedSettings]];
-    datadaseArray = [database getWeatherArray];
+    datadaseArray = [database getAllWeathers];
 
     //если объект базы данных содержит ошибку вывести ее на экран
     if (database.error != nil) {

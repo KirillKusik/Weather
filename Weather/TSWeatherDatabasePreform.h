@@ -3,12 +3,10 @@
  который используется в обоих базах
  */
 
-#import "TSWeather.h"
-
-static NSString * kDatabaseTableName = @"Weather";
-static NSString * kDatabaseKey_ID = @"id";
-static NSString * kDatabaseKey_City = @"city";
-static NSString * kDatabaseKey_Code = @"code";
-static NSString * kDatabaseKey_Date = @"date";
-static NSString * kDatabaseKey_Temp = @"temp";
-static NSString * kDatabaseKey_Text = @"text";
+static NSString *const kDatabaseTableName = @"Weather";
+static NSString *const kDatabaseKey_ID = @"id";
+static NSString *const kDatabaseKey_City = @"city";
+static NSString *const kDatabaseKey_Code = @"code";
+static NSString *const kDatabaseKey_Date = @"date";
+static NSString *const kDatabaseKey_Temp = @"temp";
+static NSString *const kDatabaseKey_Text = @"text";

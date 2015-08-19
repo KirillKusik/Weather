@@ -3,6 +3,7 @@
  Для подключения к базе используется оболочка fmdb.
  */
 
+#import "TSWeather.h"
 #import "TSWeatherSQLite.h"
 #import "TSSettings.h"
 #import "FMDB.h"

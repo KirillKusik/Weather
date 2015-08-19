@@ -41,7 +41,7 @@ NSInteger const PICKER_VIEW_STEP = 5;
 }
 
 //изменить базу данных
--(IBAction)databaseCheng{
+-(IBAction)databaseChange{
     
     if(chengDatabaseControl.selectedSegmentIndex == 0){
         
@@ -90,7 +90,7 @@ NSInteger const PICKER_VIEW_STEP = 5;
         [[TSSettings sharedSettings] saveSettings];
         
         TSWeatherDatabase *database = [[TSWeatherDatabase alloc] initWithSettings:[TSSettings sharedSettings]];
-        [database removeUnneededRecords];
+        [database removeSurplusRecords];
     }
 }
 

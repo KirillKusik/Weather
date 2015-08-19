@@ -6,6 +6,8 @@
 #import <Foundation/Foundation.h>
 #import "TSWeatherDatabasePreform.h"
 
+@class TSWeather;
+
 @interface TSWeatherSQLite : NSObject
 
 @property (nonatomic, readonly) NSError *error;

@@ -5,6 +5,8 @@
 #import <UIKit/UIKit.h>
 #import "TSWeatherDatabasePreform.h"
 
+@class TSWeather;
+
 @interface TSWeatherCoreData :NSObject
 
 @property (strong, nonatomic) NSManagedObjectContext *managedObjectContext;

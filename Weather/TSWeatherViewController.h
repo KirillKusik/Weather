@@ -4,6 +4,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface TSWeatherViewController : UIViewController <UITableViewDelegate, UISearchBarDelegate, UISearchDisplayDelegate>
-
+@interface TSWeatherViewController : UIViewController
+        
 @end

@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		840F7055192A823100CDAFD4 /* TSWeatherSQLite.m in Sources */ = {isa = PBXBuildFile; fileRef = 840F7054192A823100CDAFD4 /* TSWeatherSQLite.m */; };
 		840F7058192A89CE00CDAFD4 /* TSYahooWeather.m in Sources */ = {isa = PBXBuildFile; fileRef = 840F7057192A89CE00CDAFD4 /* TSYahooWeather.m */; };
-		840F705B192A94F700CDAFD4 /* TSSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 840F705A192A94F700CDAFD4 /* TSSettings.m */; };
 		840F7130192F897700CDAFD4 /* TSHistoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 840F712F192F897700CDAFD4 /* TSHistoryViewController.m */; };
 		8421EA26192389E3001465BB /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8421EA25192389E3001465BB /* CoreData.framework */; };
 		8421EA29192398C6001465BB /* TSWeatherDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 8421EA28192398C6001465BB /* TSWeatherDatabase.m */; };
@@ -46,8 +45,6 @@
 		840F7054192A823100CDAFD4 /* TSWeatherSQLite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSWeatherSQLite.m; sourceTree = "<group>"; };
 		840F7056192A89CE00CDAFD4 /* TSYahooWeather.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSYahooWeather.h; sourceTree = "<group>"; };
 		840F7057192A89CE00CDAFD4 /* TSYahooWeather.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSYahooWeather.m; sourceTree = "<group>"; };
-		840F7059192A94F700CDAFD4 /* TSSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSSettings.h; sourceTree = "<group>"; };
-		840F705A192A94F700CDAFD4 /* TSSettings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSSettings.m; sourceTree = "<group>"; };
 		840F712E192F897700CDAFD4 /* TSHistoryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TSHistoryViewController.h; path = ../TSHistoryViewController.h; sourceTree = "<group>"; };
 		840F712F192F897700CDAFD4 /* TSHistoryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TSHistoryViewController.m; path = ../TSHistoryViewController.m; sourceTree = "<group>"; };
 		8421EA25192389E3001465BB /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
@@ -164,7 +161,6 @@
 				8452D5F21AEC050300EB905D /* Controller */,
 				8452D5F11AEC04C900EB905D /* Model */,
 				840F7131192FDCBC00CDAFD4 /* DB */,
-				844DF9251B124D8B00114D3D /* Settings */,
 				844DF9261B124DC100114D3D /* Weather REST */,
 				847B6C6D1B402268003C074E /* Library */,
 				8424BAE419228C4C00BCE56F /* Image */,
@@ -195,15 +191,6 @@
 				8424BAE719228C6200BCE56F /* Wather.png */,
 			);
 			name = Image;
-			sourceTree = "<group>";
-		};
-		844DF9251B124D8B00114D3D /* Settings */ = {
-			isa = PBXGroup;
-			children = (
-				840F7059192A94F700CDAFD4 /* TSSettings.h */,
-				840F705A192A94F700CDAFD4 /* TSSettings.m */,
-			);
-			name = Settings;
 			sourceTree = "<group>";
 		};
 		844DF9261B124DC100114D3D /* Weather REST */ = {
@@ -358,7 +345,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = TS;
-				LastUpgradeCheck = 0510;
+				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = 123;
 			};
 			buildConfigurationList = 8424BAA119228AD500BCE56F /* Build configuration list for PBXProject "Weather" */;
@@ -401,7 +388,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				840F705B192A94F700CDAFD4 /* TSSettings.m in Sources */,
 				849E3A8B19671539003E40D6 /* FMDatabase.m in Sources */,
 				840F7058192A89CE00CDAFD4 /* TSYahooWeather.m in Sources */,
 				8428E7541AFA189F00709595 /* TSWeather.m in Sources */,
@@ -472,6 +458,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -486,7 +473,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -519,7 +506,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -531,9 +518,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Weather/Weather-Prefix.pch";
 				INFOPLIST_FILE = "Weather/Weather-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
+				PRODUCT_BUNDLE_IDENTIFIER = "book.coredata.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -544,9 +534,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Weather/Weather-Prefix.pch";
 				INFOPLIST_FILE = "Weather/Weather-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
+				PRODUCT_BUNDLE_IDENTIFIER = "book.coredata.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};

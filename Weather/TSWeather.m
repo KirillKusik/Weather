@@ -11,27 +11,22 @@
 
 @implementation TSWeather
 
-//Инициализация объекта Weather с параметрами
--(id)initWithNameOfCity:(NSString *)city
-                     code:(NSString *)code
-                     date:(NSString *)date
-                     temp:(NSNumber *)temp
-                     text:(NSString *)text{
-    
+-(id)initWithNameOfCity:(NSString *)city code:(NSString *)code date:(NSString *)date temp:(NSNumber *)temp
+        text:(NSString *)text {
     self = [super init];
     if (self) {
-        _city = city;
-        _code = code;
-        _date = date;
-        _temp = temp;
-        _text = text;
+        self.city = city;
+        self.code = code;
+        self.date = date;
+        self.temp = temp;
+        self.text = text;
     }
     return  self;
 }
 
-- (NSString *)description
-{
-    return [NSString stringWithFormat:@"city-%@ code-%@ data-%@ temp-%@ text-%@", _city, _code, _date, _temp, _text];
+- (NSString *)description {
+    return [NSString stringWithFormat:@"city-%@ code-%@ data-%@ temp-%@ text-%@", self.city, self.code, self.date,
+            self.temp, self.text];
 }
 
 @end

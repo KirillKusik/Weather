@@ -5,13 +5,11 @@
 #import <Foundation/Foundation.h>
 
 @interface TSYahooGeocode : NSObject
-@property (nonatomic, readonly) NSString *country;
-@property (nonatomic, readonly) NSString *region;
-@property (nonatomic, readonly) NSString *town;
-@property (nonatomic, readonly) NSString *geocode;
+@property (nonatomic) NSString *country;
+@property (nonatomic) NSString *region;
+@property (nonatomic) NSString *town;
+@property (nonatomic) NSString *geocode;
 
--(id)initGeocodeWithContry:(NSString *)country
-                    region:(NSString *)region
-                      town:(NSString *)town
-                   geocode:(NSString *)geocode;
+-(id)initGeocodeWithContry:(NSString *)country region:(NSString *)region town:(NSString *)town
+        geocode:(NSString *)geocode;
 @end

@@ -8,235 +8,180 @@
 #import "TSWeatherSQLite.h"
 #import "TSWeatherCoreData.h"
 
+static NSString *kDatabaseSettings_databaseType = @"DBType";
+static NSString *kDatabaseSettings_databaseCount = @"DBCount";
+static TSWeatherDatabase *__sharedWeatherDatabase = nil;
+
+@interface TSWeatherDatabase ()
+@property DatabaseType databaseType;
+@property NSUInteger databaseCount;
+@property (nonatomic) NSError *error;
+@end
 
 @implementation TSWeatherDatabase
 
--(instancetype)initWithSettings:(TSSettings *)settings{
-    
-    self = [super init];
-    if (self) {
-        
-        databaseType = settings.databaseType;
-        databaseCount = settings.databaseCount;
-    }
-    
-    return self;
+#pragma mark - Database Initialization
++(instancetype)sharedDatabase {
+    static dispatch_once_t oneToken;
+    dispatch_once(&oneToken, ^{__sharedWeatherDatabase = [[TSWeatherDatabase alloc] init];
+        [__sharedWeatherDatabase restoreSettings];});
+    return __sharedWeatherDatabase;
 }
 
+-(void)restoreSettings {
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    self.databaseType = [[userDefaults objectForKey:kDatabaseSettings_databaseType] boolValue];
+    NSUInteger count = [[userDefaults objectForKey:kDatabaseSettings_databaseCount] integerValue];
+    if (count == 0) {
+        self.databaseCount = 5;
+    } else {
+        self.databaseCount = count;
+    }
+}
 
-//Метод добавляет значения (класс Weather) в базу данных
-//которая на данный момент указанна в настройках как активная
-//Если запись не произошла па какой-то причине метод возвращает NO
-//и генерирует в данных класса error
--(BOOL) addWeather:(TSWeather *)weather{
-    
-    //Если в настройках указан тип базы CoreData
-    if (databaseType == CoreDataDatabaseType){
-        
-        //добавляем запись в базу CoreData
+#pragma mark - Change database settings
+-(void)migrateToDatabase:(DatabaseType)databaseType {
+    if (self.databaseType != databaseType) {
+        self.databaseType = databaseType;
+        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+        [userDefaults setObject:@(self.databaseType) forKey:kDatabaseSettings_databaseType];
+        [userDefaults synchronize];
+        if (self.databaseType == SQLiteDatabaseType) {
+            TSWeatherCoreData *coreData = [[TSWeatherCoreData alloc] init];
+            NSArray *weatherArray = [coreData getWeatherArray];
+            TSWeatherSQLite *sqLite = [[TSWeatherSQLite alloc] init];
+            for (TSWeather *weather in weatherArray) {
+                [sqLite addWeather:weather];
+                [coreData deleteWeather:weather];
+            }
+        } else if (self.databaseType == CoreDataDatabaseType) {
+            TSWeatherSQLite *sqLite = [[TSWeatherSQLite alloc] init];
+            NSArray *weatherArray = [sqLite getWeatherArray];
+            TSWeatherCoreData *coreData = [[TSWeatherCoreData alloc] init];
+            for (TSWeather *weather in weatherArray) {
+                [coreData addWeather:weather];
+                [sqLite deleteWeather:weather];
+            }
+        }
+    }
+}
+
+-(void)setMaxRecordsValueInDatabase:(NSUInteger)maxRecordsValue {
+    if (self.databaseCount != maxRecordsValue) {
+        self.databaseCount = maxRecordsValue;
+        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+        [userDefaults setObject:@(self.databaseCount) forKey:kDatabaseSettings_databaseCount];
+        [userDefaults synchronize];
+        if (self.databaseType == CoreDataDatabaseType) {
+            TSWeatherCoreData *coreData = [[TSWeatherCoreData alloc] init];
+            [coreData setCountRecords:self.databaseCount];
+        } else if (self.databaseType == SQLiteDatabaseType) {
+            TSWeatherSQLite *sqLite = [[TSWeatherSQLite alloc] init];
+            [sqLite setCountRecords:self.databaseCount];
+        } else {
+            [self generateDatabaseTypeError];
+        }
+    }
+}
+
+#pragma mark - Returns database parameters
+-(NSUInteger)maxRecordsValueInDatabase {
+    return self.databaseCount;
+}
+
+-(NSUInteger)recordsCount {
+    return [[self getAllWeathers] count];
+}
+
+#pragma mark - Methods of adding, deleting, and getting the content database
+-(BOOL)addWeather:(TSWeather *)weather {
+    if (self.databaseType == CoreDataDatabaseType) {
         TSWeatherCoreData *coreData = [[TSWeatherCoreData alloc] init];
-        if ([coreData addWeather:weather]){
-            
-            [coreData setCountRecords:databaseCount];
+        if ([coreData addWeather:weather]) {
+            [coreData setCountRecords:self.databaseCount];
             return YES;
-        } else{//Если CoreData не добавить запись
-            
-            _error = coreData.error;
+        } else {
+            self.error = coreData.error;
             return NO;
         }
-    }//Если в настройках указан тип базы данных SQLite
-    else if (databaseType == SQLiteDatabaseType){
-        
-        //добавляем запись в базу SQLite
+    }
+    else if (self.databaseType == SQLiteDatabaseType) {
         TSWeatherSQLite *sqLite = [[TSWeatherSQLite alloc] init];
         if ([sqLite addWeather:weather]) {
-            
-            [sqLite setCountRecords:databaseCount];
+            [sqLite setCountRecords:self.databaseCount];
             return YES;
-        } else{//Если SQLite не добавил запись
-
-            _error = sqLite.error;
+        } else {
+            self.error = sqLite.error;
             return NO;
         }
-    } else{//Если указан другой тип базы сгенерировать ошибку
-
+    } else {
         [self generateDatabaseTypeError];
         return NO;
     }
 }
 
-
-//Метод удаляет значения (класс Weather) из базы данных
-//которая на данный момент указанна в настройках как активная
-//Если удаление не произошло па какой-то причине метод возвращает NO
-//и генерирует в данных класса error
--(BOOL)deleteWeather:(TSWeather *)weather{
-    
-    //Если в настройках указан тип базы CoreData
-    if (databaseType == CoreDataDatabaseType){
-        
-        //Удаляем запись из базы CoreData
+-(BOOL)deleteWeather:(TSWeather *)weather {
+    if (self.databaseType == CoreDataDatabaseType) {
         TSWeatherCoreData *coreData = [[TSWeatherCoreData alloc] init];
-        if ([coreData deleteWeather:weather]){
-            
+        if ([coreData deleteWeather:weather]) {
             return YES;
-        } else{//Если CoreData не удалил запись
-
-            _error = coreData.error;
+        } else {
+            self.error = coreData.error;
             return NO;
         }
-    }//Если в настройках указан тип базы данных SQLite
-    else if (databaseType == SQLiteDatabaseType){
-        
-        //Удаляем запись из базы SQLite
+    }
+    else if (self.databaseType == SQLiteDatabaseType) {
         TSWeatherSQLite *sqLite = [[TSWeatherSQLite alloc] init];
         if ([sqLite deleteWeather:weather]) {
-            
             return YES;
-        } else{//Если SQLite не удалил запись
-
-            _error = sqLite.error;
+        } else {
+            self.error = sqLite.error;
             return NO;
         }
-    } else{//Если указан другой тип базы сгенерировать ошибку
-        
+    } else {
         [self generateDatabaseTypeError];
         return NO;
     }
 }
 
-
-//Возвращает массив объектов типа Weather из активной на данный момент базы
--(NSArray *)getAllWeathers{
-
-    //Если в настройках указан тип базы CoreData
-    if (databaseType == CoreDataDatabaseType){
-        
-        //Получаем содержимое базы CoreData
+-(NSArray *)getAllWeathers {
+    if (self.databaseType == CoreDataDatabaseType) {
         TSWeatherCoreData *coreData = [[TSWeatherCoreData alloc] init];
         NSArray *weatherArray = [coreData getWeatherArray];
-        
-        if ([weatherArray count] > 0){
-            
+        if ([weatherArray count] > 0) {
             return weatherArray;
-        } else{//Если массив пуст
-
-            _error = coreData.error;
+        } else {
+            self.error = coreData.error;
             return nil;
         }
     }
-    //Если в настройках указан тип базы данных SQLite
-    else if (databaseType == SQLiteDatabaseType){
-        
-        //Получаем содержимое базы SQLite
+    else if (self.databaseType == SQLiteDatabaseType){
         TSWeatherSQLite *sqLite = [[TSWeatherSQLite alloc] init];
         NSArray *weatherArray = [sqLite getWeatherArray];
-        
         if ([weatherArray count] > 0) {
-            
             return weatherArray;
-            
-        } else{//Если массив пуст
-            
-            _error = sqLite.error;
+        } else {
+            self.error = sqLite.error;
             return nil;
         }
-    } else{//Если указан другой тип базы сгенерировать ошибку
-        
+    } else {
         [self generateDatabaseTypeError];
         return nil;
     }
 }
 
-
-//Метод удалит лишние поля (начиная от самых старых)
-//если в базе данных полей больше чем указанно в настройках
--(void)removeSurplusRecords{
-    
-    //Если в настройках указан тип базы CoreData
-    if (databaseType == CoreDataDatabaseType){
-        
-        //Удалить лишние записи из базы CoreData
-        TSWeatherCoreData *coreData = [[TSWeatherCoreData alloc] init];
-        [coreData setCountRecords:databaseCount];
-        
-    }
-    //Если в настройках указан тип базы данных SQLite
-    else if (databaseType == SQLiteDatabaseType){
-        
-        //Удалить лишние записи из базы SQLite
-        TSWeatherSQLite *sqLite = [[TSWeatherSQLite alloc] init];
-        [sqLite setCountRecords:databaseCount];
-        
-    } else{//Если указан другой тип базы сгенерировать ошибку
-        
-        [self generateDatabaseTypeError];
-    }
+#pragma mark - Errors metods
+-(void)generateDatabaseTypeError {
+    [self generateErrorWithDomain:@"Database Error" ErrorMessage:@"Database type error"
+            Description:@"Unknown type of database"];
 }
 
-
-//Метод копирует поля из coreData в SQLite после чего очищает исходную базу
--(void)coreDataToSql{
-    
-    //Если SQLite в данный момент активна
-    if (databaseType == SQLiteDatabaseType){
-        
-        //Получаем массив значений из CoreData
-        TSWeatherCoreData *coreData = [[TSWeatherCoreData alloc] init];
-        NSArray *weatherArray = [coreData getWeatherArray];
-        
-        //перезапись полей из coreData в SQLite
-        TSWeatherSQLite *sqLite = [[TSWeatherSQLite alloc] init];
-        for (TSWeather *weather in weatherArray){
-            
-            [sqLite addWeather:weather];
-            [coreData deleteWeather:weather];
-        }
-    }
-}
-
-
-//Метод копирует поля из SQLite в coreData после чего очищает исходную базу
--(void)sqlToCoreData{
-    
-    //Если CoreData в данный момент активна
-    if (databaseType == CoreDataDatabaseType){
-        
-        //Получаем массив значений из SQLite
-        TSWeatherSQLite *sqLite = [[TSWeatherSQLite alloc] init];
-        NSArray *weatherArray = [sqLite getWeatherArray];
-    
-        //перезапись полей из SQLite в coreData
-        //это же значение из SQLite удаляется
-        TSWeatherCoreData *coreData = [[TSWeatherCoreData alloc] init];
-        for (TSWeather *weather in weatherArray){
-            
-            [coreData addWeather:weather];
-            [sqLite deleteWeather:weather];
-        }
-    }
-}
-
-//Метод генерирует ошибку для случаев когда указан неизвестный тип базы банных
--(void)generateDatabaseTypeError{
-    
-    NSString *databaseError = @"Database Error";
-    NSString *errorMessage = @"Database type error";
-    NSString *errorDescription = @"Unknown type of database";
-    
-    [self generateErrorWithDomain:databaseError
-                     ErrorMessage:errorMessage
-                      Description:errorDescription];
-}
-
-//метод генерации ошибки
--(void)generateErrorWithDomain:(NSString *)domain
-                  ErrorMessage:(NSString *)message
-                   Description:(NSString *)description{
-    
+-(void)generateErrorWithDomain:(NSString *)domain ErrorMessage:(NSString *)message
+            Description:(NSString *)description {
     NSArray *objArray = [NSArray arrayWithObjects:description, message, nil];
-    NSArray *keyArray = [NSArray arrayWithObjects:NSLocalizedDescriptionKey, NSLocalizedFailureReasonErrorKey, nil];
+    NSArray *keyArray = [NSArray arrayWithObjects:NSLocalizedDescriptionKey, NSLocalizedFailureReasonErrorKey,
+            nil];
     NSDictionary *userInfo = [NSDictionary dictionaryWithObjects:objArray forKeys:keyArray];
-    _error = [NSError errorWithDomain:domain code:1 userInfo:userInfo];
+    self.error = [NSError errorWithDomain:domain code:1 userInfo:userInfo];
 }
 @end

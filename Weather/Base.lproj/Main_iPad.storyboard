@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6751" systemVersion="13F1112" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES" initialViewController="49e-Tb-3d3">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="8191" systemVersion="14F27" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES" initialViewController="49e-Tb-3d3">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6736"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8154"/>
     </dependencies>
     <scenes>
         <!--Weather-->
@@ -20,27 +21,27 @@
                                 <rect key="frame" x="0.0" y="0.0" width="768" height="44"/>
                                 <items/>
                             </toolbar>
-                            <searchBar contentMode="redraw" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zYj-0B-9Xr">
-                                <rect key="frame" x="0.0" y="44" width="768" height="44"/>
-                                <textInputTraits key="textInputTraits"/>
-                                <connections>
-                                    <outlet property="delegate" destination="9pv-A4-QxB" id="GMd-Lv-f4E"/>
-                                </connections>
-                            </searchBar>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="8bt-N0-fl6">
-                                <rect key="frame" x="20" y="108" width="728" height="697"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <connections>
-                                    <outlet property="dataSource" destination="9pv-A4-QxB" id="WdQ-lb-qHp"/>
-                                    <outlet property="delegate" destination="9pv-A4-QxB" id="0Pl-He-0sK"/>
-                                </connections>
-                            </tableView>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" showsHorizontalScrollIndicator="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tmM-Yz-taf">
-                                <rect key="frame" x="237" y="813" width="295" height="128"/>
+                                <rect key="frame" x="237" y="758" width="295" height="128"/>
                                 <color key="backgroundColor" red="0.86984120244565211" green="0.86984120244565211" blue="0.86984120244565211" alpha="1" colorSpace="calibratedRGB"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
+                            <tableView hidden="YES" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="6b9-kN-ZQb">
+                                <rect key="frame" x="20" y="88" width="728" height="662"/>
+                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="9pv-A4-QxB" id="tqy-h7-gbG"/>
+                                    <outlet property="delegate" destination="9pv-A4-QxB" id="wzu-Ba-JLP"/>
+                                </connections>
+                            </tableView>
+                            <searchBar contentMode="redraw" fixedFrame="YES" showsCancelButton="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fp2-Aj-12b">
+                                <rect key="frame" x="0.0" y="44" width="768" height="44"/>
+                                <textInputTraits key="textInputTraits"/>
+                                <connections>
+                                    <outlet property="delegate" destination="9pv-A4-QxB" id="zHB-XH-CwN"/>
+                                </connections>
+                            </searchBar>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
@@ -51,9 +52,9 @@
                     </view>
                     <tabBarItem key="tabBarItem" title="Weather" image="Wather.png" id="acW-dT-cKf"/>
                     <connections>
-                        <outlet property="searchCityName" destination="zYj-0B-9Xr" id="IXp-9A-fBH"/>
+                        <outlet property="searchCityName" destination="fp2-Aj-12b" id="qyM-FZ-6nI"/>
+                        <outlet property="searchCityRezalt" destination="6b9-kN-ZQb" id="FOX-X1-gcc"/>
                         <outlet property="searchDisplayController" destination="wbw-4d-bsT" id="Bez-RA-BI8"/>
-                        <outlet property="searchRezaltTable" destination="8bt-N0-fl6" id="eUF-hN-DMm"/>
                         <outlet property="weatherForecastField" destination="tmM-Yz-taf" id="gI3-oI-qik"/>
                     </connections>
                 </viewController>
@@ -61,7 +62,6 @@
                 <searchDisplayController id="wbw-4d-bsT">
                     <connections>
                         <outlet property="delegate" destination="9pv-A4-QxB" id="YpS-cc-fzL"/>
-                        <outlet property="searchBar" destination="zYj-0B-9Xr" id="9CO-dI-zTb"/>
                         <outlet property="searchContentsController" destination="9pv-A4-QxB" id="4Wm-9p-9Qn"/>
                         <outlet property="searchResultsDataSource" destination="9pv-A4-QxB" id="B6X-mh-Cgv"/>
                         <outlet property="searchResultsDelegate" destination="9pv-A4-QxB" id="8hV-fL-tZP"/>
@@ -106,7 +106,7 @@
                                     <segment title="SQLite"/>
                                 </segments>
                                 <connections>
-                                    <action selector="databaseChange" destination="8rJ-Kc-sve" eventType="valueChanged" id="CWz-as-0Gr"/>
+                                    <action selector="databaseChange" destination="8rJ-Kc-sve" eventType="valueChanged" id="e3o-Xu-eQ0"/>
                                 </connections>
                             </segmentedControl>
                             <pickerView contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="D2E-im-DxW">
@@ -189,9 +189,4 @@
         <image name="Settings.png" width="40" height="40"/>
         <image name="Wather.png" width="40" height="40"/>
     </resources>
-    <simulatedMetricsContainer key="defaultSimulatedMetrics">
-        <simulatedStatusBarMetrics key="statusBar"/>
-        <simulatedOrientationMetrics key="orientation"/>
-        <simulatedScreenMetrics key="destination"/>
-    </simulatedMetricsContainer>
 </document>

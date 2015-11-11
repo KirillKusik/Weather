@@ -6,23 +6,20 @@
 
 @implementation TSYahooGeocode
 
--(id)initGeocodeWithContry:(NSString *)country
-                    region:(NSString *)region
-                      town:(NSString *)town
-                   geocode:(NSString *)geocode{
-    
+-(id)initGeocodeWithContry:(NSString *)country region:(NSString *)region town:(NSString *)town
+        geocode:(NSString *)geocode {
     self = [super init];
     if (self) {
-        _country = country;
-        _region = region;
-        _town = town;
-        _geocode = geocode;
+        self.country = country;
+        self.region = region;
+        self.town = town;
+        self.geocode = geocode;
     }
     return self;
 }
 
-- (NSString *)description
-{
-    return [NSString stringWithFormat:@"country:%@ region:%@ town:%@ geocode:%@", _country, _region, _town, _geocode];
+- (NSString *)description {
+    return [NSString stringWithFormat:@"country:%@ region:%@ town:%@ geocode:%@", self.country, self.region, self.town,
+            self.geocode];
 }
 @end

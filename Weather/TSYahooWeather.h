@@ -8,12 +8,13 @@
 #import <Foundation/Foundation.h>
 #import "TSWeather.h"
 
+@protocol TSYahooWeatherProtocol <NSObject>
+-(void)TakeYahooGeocodeArray:(NSArray *)geocodeArray error:(NSError *)error;
+-(void)TakeYahooWeather:(TSWeather *)weather error:(NSError *)error;
+@end
+
 @interface TSYahooWeather : NSObject
-@property (readonly) NSError *error;
-
-//Возвращает массив геокодов населенны пунктов названия которых соответствуют введенному слову
--(NSArray *)getYahooGeocodes:(NSString *)city;
-
-//метод возвращает прогноз погоды (объект Weather) по введенному геокоду
--(TSWeather *)getYahooWeather:(NSString *)geocode;
+-(instancetype)initWithDelegate:(id)delegate;
+-(void)getYahooGeocodes:(NSString *)city;
+-(void)getYahooWeather:(NSString *)geocode;
 @end

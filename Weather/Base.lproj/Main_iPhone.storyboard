@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6751" systemVersion="13F1112" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="8YX-ce-x5E">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="8191" systemVersion="14F27" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="8YX-ce-x5E">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6736"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="8154"/>
     </dependencies>
     <scenes>
         <!--First-->
@@ -17,16 +18,30 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="07v-bC-lpd">
-                                <rect key="frame" x="18" y="81" width="285" height="89"/>
+                                <rect key="frame" x="18" y="80" width="285" height="89"/>
                                 <color key="backgroundColor" red="0.88595448369565222" green="0.88595448369565222" blue="0.88595448369565222" alpha="1" colorSpace="calibratedRGB"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
-                            <searchBar contentMode="redraw" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="5Du-yX-Axt">
-                                <rect key="frame" x="0.0" y="22" width="320" height="44"/>
-                                <textInputTraits key="textInputTraits"/>
+                            <tableView hidden="YES" clipsSubviews="YES" alpha="0.90000000000000002" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="meq-Ur-cT2">
+                                <rect key="frame" x="18" y="64" width="285" height="447"/>
+                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="tintColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="sectionIndexColor" red="0.94590692929999998" green="0.94590692929999998" blue="0.94590692929999998" alpha="1" colorSpace="calibratedRGB"/>
                                 <connections>
-                                    <outlet property="delegate" destination="CZ4-MO-1fc" id="xng-HR-QP5"/>
+                                    <outlet property="dataSource" destination="CZ4-MO-1fc" id="cAf-G5-Aio"/>
+                                    <outlet property="delegate" destination="CZ4-MO-1fc" id="L5t-oK-Ub9"/>
+                                </connections>
+                            </tableView>
+                            <searchBar contentMode="redraw" fixedFrame="YES" showsCancelButton="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cv8-9p-w92">
+                                <rect key="frame" x="0.0" y="20" width="320" height="44"/>
+                                <textInputTraits key="textInputTraits"/>
+                                <scopeButtonTitles>
+                                    <string>Title</string>
+                                    <string>Title</string>
+                                </scopeButtonTitles>
+                                <connections>
+                                    <outlet property="delegate" destination="CZ4-MO-1fc" id="nPJ-1R-rRg"/>
                                 </connections>
                             </searchBar>
                         </subviews>
@@ -34,7 +49,8 @@
                     </view>
                     <tabBarItem key="tabBarItem" title="Weather" image="Wather.png" id="u1e-5L-l1D"/>
                     <connections>
-                        <outlet property="searchCityName" destination="5Du-yX-Axt" id="xaR-Mf-MZF"/>
+                        <outlet property="searchCityName" destination="cv8-9p-w92" id="grD-x6-njh"/>
+                        <outlet property="searchCityRezalt" destination="meq-Ur-cT2" id="uiP-TN-ocL"/>
                         <outlet property="searchDisplayController" destination="Cf8-TR-3bz" id="xTv-FL-svu"/>
                         <outlet property="weatherForecastField" destination="07v-bC-lpd" id="ol2-Y6-8lg"/>
                     </connections>
@@ -43,7 +59,6 @@
                 <searchDisplayController id="Cf8-TR-3bz">
                     <connections>
                         <outlet property="delegate" destination="CZ4-MO-1fc" id="RvB-Ew-4SF"/>
-                        <outlet property="searchBar" destination="5Du-yX-Axt" id="Uaq-c9-q3O"/>
                         <outlet property="searchContentsController" destination="CZ4-MO-1fc" id="cfJ-g6-fZv"/>
                         <outlet property="searchResultsDataSource" destination="CZ4-MO-1fc" id="75v-BR-ygS"/>
                         <outlet property="searchResultsDelegate" destination="CZ4-MO-1fc" id="9b0-Nw-eu5"/>
@@ -64,7 +79,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="Frn-ek-fRf">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" showsHorizontalScrollIndicator="NO" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="Frn-ek-fRf">
                                 <rect key="frame" x="0.0" y="33" width="320" height="535"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <connections>
@@ -107,17 +122,21 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="nup-73-rDp">
-                                <rect key="frame" x="99" y="56" width="123" height="29"/>
+                                <rect key="frame" x="99" y="43" width="123" height="29"/>
                                 <segments>
                                     <segment title="CoreData"/>
                                     <segment title="SQLite"/>
                                 </segments>
                                 <connections>
-                                    <action selector="databaseChange" destination="QUy-BD-bpt" eventType="valueChanged" id="g2A-WR-nIJ"/>
+                                    <action selector="databaseChange" destination="QUy-BD-bpt" eventType="valueChanged" id="NHx-oY-Yy5"/>
                                 </connections>
                             </segmentedControl>
                             <pickerView contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Cby-Og-VQr">
                                 <rect key="frame" x="0.0" y="233" width="320" height="162"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="QUy-BD-bpt" id="Vep-PQ-AAd"/>
+                                    <outlet property="delegate" destination="QUy-BD-bpt" id="PHx-mM-QSx"/>
+                                </connections>
                             </pickerView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -125,8 +144,8 @@
                     </view>
                     <tabBarItem key="tabBarItem" title="Setings" image="Settings.png" id="Z7h-1E-pvt"/>
                     <connections>
-                        <outlet property="chengDatabaseControl" destination="nup-73-rDp" id="TXH-t8-j3A"/>
-                        <outlet property="pickerView" destination="Cby-Og-VQr" id="eoa-RN-l8x"/>
+                        <outlet property="chengDatabaseControl" destination="nup-73-rDp" id="pRz-sR-zZM"/>
+                        <outlet property="pickerView" destination="Cby-Og-VQr" id="4qk-pA-rJW"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3qq-4t-Ow8" sceneMemberID="firstResponder"/>
@@ -159,9 +178,4 @@
         <image name="Settings.png" width="40" height="40"/>
         <image name="Wather.png" width="40" height="40"/>
     </resources>
-    <simulatedMetricsContainer key="defaultSimulatedMetrics">
-        <simulatedStatusBarMetrics key="statusBar"/>
-        <simulatedOrientationMetrics key="orientation"/>
-        <simulatedScreenMetrics key="destination" type="retina4"/>
-    </simulatedMetricsContainer>
 </document>

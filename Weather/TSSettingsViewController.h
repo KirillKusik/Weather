@@ -4,11 +4,6 @@
 
 #import <UIKit/UIKit.h>
 
-
-@interface TSSettingsViewController : UIViewController <UIPickerViewDataSource, UIPickerViewDelegate>{
-    IBOutlet UISegmentedControl *chengDatabaseControl;
-}
-
-@property (nonatomic, weak) IBOutlet UIPickerView *pickerView;
+@interface TSSettingsViewController : UIViewController <UIPickerViewDataSource, UIPickerViewDelegate>
 
 @end

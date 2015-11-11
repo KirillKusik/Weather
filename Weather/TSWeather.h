@@ -11,18 +11,13 @@
 
 @interface TSWeather : NSObject
 
-@property (nonatomic, readonly) NSString * city;
-@property (nonatomic, readonly) NSString * code;
-@property (nonatomic, readonly) NSString * date;
-@property (nonatomic, readonly) NSNumber * temp;
-@property (nonatomic, readonly) NSString * text;
+@property (nonatomic) NSString *city;
+@property (nonatomic) NSString *code;
+@property (nonatomic) NSString *date;
+@property (nonatomic) NSNumber *temp;
+@property (nonatomic) NSString *text;
 
-
-//Инициализация объекта Weather с параметрами
--(id)initWithNameOfCity:(NSString *)city
-                   code:(NSString *)code
-                   date:(NSString *)date
-                   temp:(NSNumber *)temp
-                   text:(NSString *)text;
+-(id)initWithNameOfCity:(NSString *)city code:(NSString *)code date:(NSString *)date temp:(NSNumber *)temp
+        text:(NSString *)text;
 
 @end

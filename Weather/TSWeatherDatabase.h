@@ -15,7 +15,6 @@ typedef enum {
 
 @interface TSWeatherDatabase : NSObject
 
-
 +(instancetype)sharedDatabase;
 -(void)migrateToDatabase:(DatabaseType)databaseType;
 -(void)setMaxRecordsValueInDatabase:(NSUInteger)maxRecordsValue;

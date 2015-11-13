@@ -4,6 +4,13 @@
 
 #import "TSYahooGeocode.h"
 
+@interface TSYahooGeocode ()
+@property (nonatomic) NSString *country;
+@property (nonatomic) NSString *region;
+@property (nonatomic) NSString *town;
+@property (nonatomic) NSString *geocode;
+@end
+
 @implementation TSYahooGeocode
 
 -(id)initGeocodeWithContry:(NSString *)country region:(NSString *)region town:(NSString *)town

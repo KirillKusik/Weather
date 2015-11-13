@@ -9,6 +9,14 @@
 
 #import "TSWeather.h"
 
+@interface TSWeather ()
+@property (nonatomic) NSString *city;
+@property (nonatomic) NSString *code;
+@property (nonatomic) NSString *date;
+@property (nonatomic) NSNumber *temp;
+@property (nonatomic) NSString *text;
+@end
+
 @implementation TSWeather
 
 -(id)initWithNameOfCity:(NSString *)city code:(NSString *)code date:(NSString *)date temp:(NSNumber *)temp

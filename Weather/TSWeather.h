@@ -11,13 +11,11 @@
 
 @interface TSWeather : NSObject
 
-@property (nonatomic) NSString *city;
-@property (nonatomic) NSString *code;
-@property (nonatomic) NSString *date;
-@property (nonatomic) NSNumber *temp;
-@property (nonatomic) NSString *text;
-
 -(id)initWithNameOfCity:(NSString *)city code:(NSString *)code date:(NSString *)date temp:(NSNumber *)temp
         text:(NSString *)text;
-
+-(NSString *)city;
+-(NSString *)code;
+-(NSString *)date;
+-(NSString *)text;
+-(NSNumber *)temp;
 @end
